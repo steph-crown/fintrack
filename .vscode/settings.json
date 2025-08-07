@@ -6,7 +6,9 @@
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit"
   },
-  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "typescript.suggest.paths": true,
   "typescript.suggest.autoImports": true,
   "emmet.includeLanguages": {
     "typescript": "typescriptreact",

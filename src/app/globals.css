@@ -3,15 +3,26 @@
 :root {
   --background: #ffffff;
   --foreground: #1b2528;
+  --primary: #437d8e;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+
   --font-sans: var(--font-public-sans);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+.icon-btn {
+  @apply p-2 text-foreground hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer;
+}
+
+.main-px {
+  @apply px-5 md:px-8 lg:px-10 xl:px-12;
 }
