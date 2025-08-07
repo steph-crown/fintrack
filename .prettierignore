@@ -1,0 +1,18 @@
+# Ignore artifacts:
+build
+coverage
+dist
+node_modules
+
+# Ignore all HTML files:
+*.html
+
+# Ignore generated files
+.next/
+out/
+
+# Ignore config files that shouldn't be formatted
+.env*
+*.config.js
+next.config.*
+tailwind.config.*
