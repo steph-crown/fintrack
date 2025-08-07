@@ -1,9 +1,3 @@
-import { Header } from '@/components';
-
 export default function Home() {
-  return (
-    <div>
-      <Header />
-    </div>
-  );
+  return <div className="py-6">Dashboard</div>;
 }

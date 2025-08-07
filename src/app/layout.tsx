@@ -1,3 +1,5 @@
+import { Header, MobileSidebar, Sidebar } from '@/components';
+import { SidebarProvider } from '@/contexts';
 import type { Metadata } from 'next';
 import { Public_Sans } from 'next/font/google';
 import './globals.css';
@@ -25,7 +27,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${publicSans.variable} font-sans antialiased`}>
-        {children}
+        <SidebarProvider>
+          <Header />
+
+          <MobileSidebar />
+
+          <main className="main-x-pad flex gap-8 lg:gap-12">
+            <aside className="hidden md:block w-[15rem] lg:w-[17.5rem] xl:w-80 max-w-full h-full shrink-0">
+              <Sidebar />
+            </aside>
+
+            {children}
+          </main>
+        </SidebarProvider>
       </body>
     </html>
   );

@@ -3,13 +3,19 @@
 :root {
   --background: #ffffff;
   --foreground: #1b2528;
+
   --primary: #437d8e;
+  --primary-2: #3a6c7b;
+  --primary-3: #386776;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --color-primary: var(--primary);
+  --color-primary-2: var(--primary-2);
+  --color-primary-3: var(--primary-3);
 
   --font-sans: var(--font-public-sans);
 }
@@ -23,6 +29,6 @@ body {
   @apply p-2 text-foreground hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer;
 }
 
-.main-px {
+.main-x-pad {
   @apply px-5 md:px-8 lg:px-10 xl:px-12;
 }
