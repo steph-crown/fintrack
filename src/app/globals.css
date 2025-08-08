@@ -58,3 +58,11 @@ h1 {
 h1.card-header {
   @apply text-[1.8rem] lg:text-[2.3rem] xl:text-[2.425rem];
 }
+
+.summary-cards {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-7;
+
+  @media (min-width: 1400px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
