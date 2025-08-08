@@ -1,5 +1,6 @@
 import { Header, MobileSidebar, Sidebar } from '@/components';
-import { SidebarProvider } from '@/contexts';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { SearchProvider, SidebarProvider } from '@/contexts';
 import type { Metadata } from 'next';
 import { Public_Sans } from 'next/font/google';
 import './globals.css';
@@ -27,19 +28,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${publicSans.variable} font-sans antialiased`}>
-        <SidebarProvider>
-          <Header />
-
-          <MobileSidebar />
-
-          <main className="main-x-pad flex gap-8 lg:gap-12">
-            <aside className="hidden md:block w-[15rem] lg:w-[17.5rem] xl:w-80 max-w-full h-full shrink-0">
-              <Sidebar />
-            </aside>
-
-            {children}
-          </main>
-        </SidebarProvider>
+        <SearchProvider>
+          <SidebarProvider>
+            <ErrorBoundary>
+              <Header />
+              <MobileSidebar />
+              <main className="main-x-pad flex gap-8 lg:gap-12 ">
+                <aside className="hidden lg:block w-[15rem] lg:w-[17.5rem] xl:w-80 max-w-full h-full shrink-0">
+                  <Sidebar />
+                </aside>
+                <div className=" py-4 sm:py-7 w-full">{children}</div>
+              </main>
+            </ErrorBoundary>
+          </SidebarProvider>
+        </SearchProvider>
       </body>
     </html>
   );

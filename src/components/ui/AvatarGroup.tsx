@@ -7,7 +7,7 @@ interface AvatarGroupProps {
   className?: string;
 }
 
-export function AvatarGroup({ users, size = 32, className }: AvatarGroupProps) {
+export function AvatarGroup({ users, size = 36, className }: AvatarGroupProps) {
   return (
     <div className={`flex -space-x-2 ${className}`}>
       {users.map((user, index) => (
@@ -15,7 +15,10 @@ export function AvatarGroup({ users, size = 32, className }: AvatarGroupProps) {
           key={user.username}
           user={user}
           size={size}
-          className={`relative z-${10 - index} hover:z-20`}
+          className={`relative hover:z-20`}
+          style={{
+            zIndex: 10 - index,
+          }}
         />
       ))}
     </div>

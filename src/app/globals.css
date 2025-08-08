@@ -7,6 +7,15 @@
   --primary: #437d8e;
   --primary-2: #3a6c7b;
   --primary-3: #386776;
+  --primary-4: #34616f;
+  --primary-5: #4b8b9f;
+  --primary-6: #49656e;
+
+  --success: #087a2e;
+  --error: #c6381b;
+
+  --black-2: #15272d;
+  --black-3: #020303;
 }
 
 @theme inline {
@@ -16,6 +25,15 @@
   --color-primary: var(--primary);
   --color-primary-2: var(--primary-2);
   --color-primary-3: var(--primary-3);
+  --color-primary-4: var(--primary-4);
+  --color-primary-5: var(--primary-5);
+  --color-primary-6: var(--primary-6);
+
+  --color-success: var(--success);
+  --color-error: var(--error);
+
+  --color-black-2: var(--black-2);
+  --color-black-3: var(--black-3);
 
   --font-sans: var(--font-public-sans);
 }
@@ -31,4 +49,12 @@ body {
 
 .main-x-pad {
   @apply px-5 md:px-8 lg:px-10 xl:px-12;
+}
+
+h1 {
+  @apply text-[1.5rem] lg:text-[2rem] xl:text-[2.125rem] leading-[1.75rem] lg:leading-[2.125rem] xl:leading-[2.5rem] font-bold tracking-[-2%];
+}
+
+h1.card-header {
+  @apply text-[1.8rem] lg:text-[2.3rem] xl:text-[2.425rem];
 }

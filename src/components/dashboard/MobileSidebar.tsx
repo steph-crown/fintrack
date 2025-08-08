@@ -23,14 +23,14 @@ export function MobileSidebar() {
   return (
     <>
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black-3/50 z-40 lg:hidden transition-opacity duration-300 ${
           isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}
         onClick={close}
       />
 
       <aside
-        className={`fixed top-0 left-0 h-full w-full bg-white z-50 md:hidden transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-full max-w-md bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out shadow-xl ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -45,7 +45,10 @@ export function MobileSidebar() {
               ×
             </button>
           </div>
-          <Sidebar />
+
+          <div className="max-w-[25rem]">
+            <Sidebar />
+          </div>
         </div>
       </aside>
     </>

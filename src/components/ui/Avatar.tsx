@@ -5,9 +5,10 @@ interface AvatarProps {
   user: User;
   size?: number;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export function Avatar({ user, size = 40, className }: AvatarProps) {
+export function Avatar({ user, size = 40, className, style }: AvatarProps) {
   return (
     <div className="relative group">
       <Image
@@ -16,6 +17,7 @@ export function Avatar({ user, size = 40, className }: AvatarProps) {
         width={size}
         height={size}
         className={`rounded-full object-cover border-2 border-white ${className}`}
+        style={style}
       />
 
       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
