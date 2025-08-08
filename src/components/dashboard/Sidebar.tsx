@@ -4,15 +4,23 @@ import { navigationItems } from '@/data/navigation.data';
 import { NavigationItem } from '@/interfaces';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSidebar } from '@/contexts/SidebarContext';
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { close } = useSidebar();
 
   const isActiveLink = (href: string): boolean => {
     if (href === '/') {
       return pathname === '/';
     }
     return pathname.startsWith(href);
+  };
+
+  const handleLinkClick = () => {
+    if (window.innerWidth < 640) {
+      close();
+    }
   };
 
   return (
@@ -33,6 +41,7 @@ export function Sidebar() {
                         : 'text-foreground hover:bg-gray-50 hover:text-gray-900'
                     }
                   `}
+                onClick={handleLinkClick}
               >
                 {item.label}
               </Link>
