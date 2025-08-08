@@ -19,10 +19,10 @@ export function Header() {
         <Logo />
       </div>
 
-      <div className="flex items-center max-[300px]:gap-0 gap-1 sm:gap-7">
+      <div className="flex items-center max-[300px]:gap-0 gap-1 sm:gap-3">
         <Search />
 
-        <button className="icon-btn">
+        <button className="icon-btn mr-2">
           <GridIcon />
         </button>
 

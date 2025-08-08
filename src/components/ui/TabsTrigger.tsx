@@ -16,10 +16,10 @@ export function TabsTrigger({ children, value, className }: TabsTriggerProps) {
   return (
     <button
       onClick={() => setActiveTab(value)}
-      className={`px-7 py-3 text-[0.9375rem] leading-5 font-medium transition-colors border-b-[1.5px] -mb-[1px] cursor-pointer ${
+      className={`px-7 py-3 text-[0.9375rem] leading-5 font-medium transition-colors border-b-[1.5px] -mb-[1px] cursor-pointer hover:text-primary hover:bg-primary-4/10 rounded-t-sm ${
         isActive
           ? 'text-primary border-primary'
-          : 'text-gray-600 border-transparent hover:text-gray-800'
+          : 'text-gray-600 border-transparent '
       } ${className || ''}`}
     >
       {children}

@@ -37,7 +37,7 @@ export function SortableHeader({
         <ChevronDownIcon
           width={24}
           height={24}
-          className={`transition-transform duration-200 ${
+          className={`transition-transform duration-200 hover:scale-150 ${
             isActive
               ? isDesc
                 ? 'rotate-0 text-primary'

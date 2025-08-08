@@ -19,7 +19,9 @@ export function DashboardCard({
   const changeSign = change >= 0 ? '+' : '-';
 
   return (
-    <div className={`bg-primary-4/9 rounded-2xl p-7 ${className || ''}`}>
+    <div
+      className={`bg-primary-4/9 rounded-2xl p-7 transition-shadow hover:shadow-lg hover:bg-primary-4/20 cursor-pointer ${className || ''}`}
+    >
       <div className="flex items-center justify-between mb-[1.125rem]">
         <h3 className="font-bold text-[1.0625rem] leading-6 -tracking-[0.5%]">
           {title}

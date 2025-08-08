@@ -31,12 +31,12 @@ export const getCellClassName = (
   const baseClass = `${column.key === 'type' ? 'py-3' : 'py-[1.125rem]'} pr-3 ${column.width} ${column.minWidth} relative`;
 
   const borderClass = !isLastRow
-    ? `after:content-[""] after:absolute after:bottom-0 after:left-0 after:h-px after:bg-gray-200 after:${column.isLastColumn ? 'right-[0.001px]' : 'right-[18px]'}`
+    ? `after:content-[""] after:absolute after:bottom-0 after:left-0 after:h-px after:bg-gray-200 ${column.isLastColumn ? 'after:right-[0.001px]' : 'after:right-[18px]'}`
     : '';
 
   return `${baseClass} ${borderClass}`;
 };
 
 export const getColumnHeaderClassName = (column: ColumnConfig): string => {
-  return `py-1 pr-3 ${column.width} ${column.minWidth} after:content-[''] after:absolute after:bottom-0 after:left-0 after:${column.isLastColumn ? 'right-0' : 'right-[18px]'} after:right-[0.001px]  after:h-px after:bg-gray-200 relative`;
+  return `py-1 pr-3 ${column.width} ${column.minWidth} after:content-[''] after:absolute after:bottom-0 after:left-0 ${column.isLastColumn ? 'after:right-0' : 'after:right-[18px]'}   after:h-px after:bg-gray-200 relative`;
 };

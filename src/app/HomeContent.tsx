@@ -29,10 +29,11 @@ export default function HomeContent() {
           <StatusTag status="success">Active</StatusTag>
         </div>
         <div className="flex items-center gap-3">
-          <button className=" rounded-2xl bg-primary px-[1.125rem] py-2 font-medium text-[0.9375rem] leading-5 text-black-3">
+          <button className=" rounded-2xl bg-primary px-[1.125rem] py-2 font-medium text-[0.9375rem] leading-5 text-black-3 hover:bg-primary/80 transition-colors cursor-pointer">
             Share
           </button>
-          <button className="rounded-2xl p-2 border border-solid border-primary-6/20">
+
+          <button className="rounded-2xl p-2 border border-solid border-primary-6/20 hover:border-primary transition-colors cursor-pointer">
             <MoreIcon />
           </button>
         </div>
@@ -53,7 +54,7 @@ export default function HomeContent() {
         </TabsList>
 
         <TabsContent value="overview">
-          <div className="flex flex-col gap-y-8">
+          <div className="flex flex-col gap-y-7">
             <DashboardSummary data={dashboardData} className="py-3" />
             <TransactionsTable />
           </div>
