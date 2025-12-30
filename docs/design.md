@@ -230,7 +230,7 @@ enum ValidationErrorKind {
 
 **Currency:**
 
-- Accepted: NGN, USD, GBP, EUR, CAD, AUD, JPY, INR (extensible list)
+- Accepted: ngn, usd, gbp, eur, cad, aud, jpy (extensible list)
 - Set during `fintrack init` and cannot be changed (immutable per tracker)
 
 ---
