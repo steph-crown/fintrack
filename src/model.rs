@@ -24,3 +24,9 @@ pub enum Currency {
   AUD,
   JPY,
 }
+
+#[derive(clap::ValueEnum, Clone, Debug)]
+pub enum Category {
+  Income,
+  Expenses,
+}

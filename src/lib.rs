@@ -8,6 +8,7 @@ pub mod utils;
 // utils
 pub use utils::command_prelude;
 pub use utils::context::GlobalContext;
+pub use utils::parsers;
 
 // model
 pub use error::*;

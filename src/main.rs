@@ -1,5 +1,5 @@
 use clap::Command;
-use fintrack::{commands, GlobalContext};
+use fintrack::{GlobalContext, commands};
 
 fn main() {
   let exit_code = match run() {
