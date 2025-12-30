@@ -1,129 +1,328 @@
-# fintrack [in progress 1%]
+# FinTrack
 
-this is a cli tool that helps you track your incomes and expenses locally without fears of storing your data in any remote server. this means you can use the data to do anything you want to do.
+> _described below is what i plan for this tool to be able to do. i'll update with what's done as i progress_
 
-<!-- the point of this iis to show them how easy it is to add records. this is a valid command -->
+A local-first CLI financial tracker written in Rust. Track your income and expenses on your own machine, with zero cloud dependencies and complete data ownership.
+
+## Why FinTrack?
+
+- **Your data stays yours.** Everything is stored locally in `~/.fintrack/`. No remote servers, no accounts, no privacy concerns.
+- **Simple and fast.** Lightweight CLI tool that gets out of your way.
+- **Reliable.** Automatic backups and corruption recovery ensure your data is never lost.
+- **Transparent.** Open-source and easy to inspect. All your financial data is in human-readable JSON.
+
+## Installation
+
+### From Source (Recommended)
+
+> _eventually, i want this to be a distributed binary that won't require you to install Rust_
+
+Requires Rust 1.70+. [Install Rust here](https://www.rust-lang.org/tools/install).
 
 ```bash
-fintrack add -c "Income" -a 4000
+git clone https://github.com/yourusername/fintrack.git
+cd fintrack
+cargo install --path .
 ```
 
-## how does it do it
+Then verify installation:
 
-- it creates a file ~/.fintrack/tracker.json (when `fintrack init` is run)
-- it stores every income/expense recorded by the user using other commands there
-- whenever user requests to see their financial history, it pretty prints this data in the json file in the console
-- it allows user to export/convert this data (json) to a csv (for use in other situations)
-- in the future, it'll have a means to pipe this data to some llm models for interpretation of financial lifestyle
-
-## installation
-
-- install the cli package
-
-```
-...
+```bash
+fintrack --version
 ```
 
-- run `fintrack init` to get started and open your system to any other command
+## Quick Start
 
-## commands
+### 1. Initialize Your Tracker
 
-- `fintrack init --currency NGN` to initialize a new tracking source file with the json structure and the default categories (Income, Expenses), and subcategory (Miscellaneous). Currency defaults to NGN. list of accepted currencies NGN, USD (...). If file already exists, tell user that cant proceed already initialize, that they can do `fintrack clear` to clear it
-- `fintrack add --category <category_name> --subcategory <subcategory_name> --amount <amount> --description <description> --date <date>` (subcategory, date and description optional. date defaults to now, subcategory defaults to "Miscellaneous". for description, can use escape identifiers like \n.) any of the flags and values can come before the other. this is also valid
-  `fintrack add --description <description> --subcategory <subcategory_name> --amount <amount> --category <category_name>`
-- `fintrack delete <record_ids>` delete record by id (Comma-Separated list of ids)
-- `fintrack delete --by-cat <category_names>` delete all records tied to a category (eg all income/ expenses. will show a confirmation prompt and inform user of the fact this can't be undone)
-- `fintrack delete --by-subcat <subcategory_names>` delete all records tied to a subcategory (eg all income/ expenses. will show a confirmation prompt and inform user of the fact this can't be undone)
-- `fintrack update <record_id> --category <category_name> --subcategory <subcategory_name> --amount <amount> --description <description> --date <date>` (updates record, accepts all flags as the `fintrack add` command, but all flags, icluding category is optional, but at least one flag must be passed)
-- `fintrack list` list all records
-- `fintrack list --first <number>` list the first `<number>` records
-- `fintrack list --last <number>` list the last `<number>` records
-- `fintrack list --start <start_date> --end <end_date>` list the records between both dates. both start and end are optional. start defaults to -Infinity, end defaults to Now.
-- `fintrack list --category <category_name>` list all records attached to a category
-- `fintrack list --subcategory <subcategory_name>` list all records attached to a subcategory
-- `fintrack category list` view category list (names)
-- `fintrack subcategory list` view subcategory list (names, date created)
-- `fintrack subcategory add <name>` add subcategory (unique name)
-- `fintrack subcategory delete <name>` delete subcategory (if some entries is tied to subcateory, cant delete. advise user to delete entries, or to call `fintrack delete --by-subcat <subcategory_names>`)
-- `fintrack subcategory update --old <old_subcategory_name> --new <new_subcaegory_name>` update subcategory name
-- `fintrack clear` delete entire file. ask for confirmation
-- `fintrack total` gives total income and total expenses and net total (income - expenses)
-- `fintrack describe` gives an EDA of the data. for now, basic EDA (please suggest?)
-- `fintrack help`
-
-> the category name and subcategory names accepted by the cli is case insensitive, but stores them in capitalized form in the json. e.g, you can create/access a subcategory as "wages" or "wAges" or "Wages", and they'll all refer to the same subcategory created as "Wages" in the json.
-
-> Names should be alphanumeric and beginning with a letter.
-
-> There is a default subcategory "Miscellaneous" that when record is added without setting subcategory, it uses miscellaneous
-
-> Can't delete categories, nor "Miscellaneous" subcategory
-
-> Date entered into cli is of the form "DD-MM-YYYY"
-
-> update and create commands always display the new value of record created/updated so user knows what was done.
-
-> deletes should show the record that was just deleted (in strikethrough or red or both)
-
-## cli features
-
-- auto complete
-
-## data shape
-
-- id (autogenerated, auto inc?)
-- category (income, expense)
-- subcategory
-- description
-- amount
-- date (defaults to current date)
-
-## what to ask?
-
-- can i protect this file ~/.fintrack/tracker.json so only my program can write to it?
-
-```json
-{
-  // for id lookup
-  // what's the best data structure to use here though? hashmap or list. i need something i can very quicky get the id when given name, and also very quickly get the name when given id. should i use two maps (forward and reverse map i.e K->V and V->K or is there a way in rust to get the key given the value in O(1) or is there a better data structure?)
-  "categories": {
-    "Income": 1,
-    "Expenses": 2
-  },
-  "subcategories": {
-    "Miscellaneous": 1,
-    "Groceries": 2
-  },
-  "records": []
-}
+```bash
+fintrack init --currency NGN
 ```
 
-## Design
+This creates `~/.fintrack/tracker.json` and sets your currency. Supported currencies: NGN, USD, GBP, EUR, CAD, AUD, JPY, INR.
 
-for the design, here are my thoughts
+### 2. Add Your First Record
 
-- use Clap to parse cli arguments and create CliArgs Struct. in main binary (main.rs), have run() fn that calls this parser, then calls validate, display error if necessary and break or call the processor.
-- the processor calls the respective module based on the second `fintrack` argument. there'll be modules for `init`, `add`, `delete`, `list`, `category`, `subcategory`, `clear`, `total`. for functionalities used across mutliple categories, functions will be created in `lib.rs`
-- these modules will all have a `process` function called from the main `process` function, with the flags.
-- for `init`, `add`, `delete`, `list`, `clear`, `total`, it's pretty straightforward. it calls its private functions to do computations and stuff, and potentially lib functions. at the end, the process function returns a response with shape of a `ProcessResponse` struct. this helps uniformity so the main process function handles all response the same way. and in case of error, they all return `ProcessError` custom error. So the return type of all process functions is therefore `Result<ProcessResponse, ProcessError>`.
-- the main process function will have arguments for stdout and stderr writers and write to them accordingly with the result.
-
-```rust
-// process function signature (in the modules)
-fn process(cli_args: CliArgs) -> Result<ProcessResponse, ProcessError>
-
-// process function signature (in main)
-fn process(cli_args: CliArgs, out_writer: &mut impl std::io::Write, err_writer: &mut impl std::io::Write) -> Result<ProcessResponse, ProcessError>
-
-// do you think these fields are enough? do you suggest other fields to be added?
-struct ProcessResponse {
-  success: bool,
-  stdout: String // message displayed to stdout
-}
-
-struct ProcessError {
-  stderr: String // message displayed to stderr
-}
+```bash
+fintrack add -c Income -a 4000 -s Wages
 ```
 
-you can draw a design system diagram if necessary
+Or using long flags:
+
+```bash
+fintrack add --category Income --amount 4000 --subcategory Wages
+```
+
+Optionally add a description and specific date:
+
+```bash
+fintrack add -c Expenses -a 150.50 -s Groceries -d "Weekly shop" --date 28-12-2025
+```
+
+**Available flags:**
+
+- `-c, --category` (required) – Income or Expenses
+- `-a, --amount` (required) – Positive number
+- `-s, --subcategory` (optional) – Defaults to Miscellaneous
+- `-d, --description` (optional) – Any text
+- `--date` (optional) – Format: DD-MM-YYYY, defaults to today
+
+### 3. View Your Data
+
+```bash
+fintrack list
+```
+
+See totals:
+
+```bash
+fintrack total
+```
+
+Filter by date range:
+
+```bash
+fintrack list --start 01-12-2025 --end 31-12-2025
+```
+
+Filter by category or subcategory:
+
+```bash
+fintrack list -c Income
+fintrack list -s Groceries
+```
+
+View last 10 records:
+
+```bash
+fintrack list -l 10
+```
+
+### 4. Manage Subcategories
+
+View all subcategories:
+
+```bash
+fintrack subcategory list
+```
+
+Add a new subcategory:
+
+```bash
+fintrack subcategory add Utilities
+```
+
+Delete a subcategory (only if it has no records):
+
+```bash
+fintrack subcategory delete Utilities
+```
+
+Rename a subcategory:
+
+```bash
+fintrack subcategory update -o Groceries -n Food
+```
+
+### 5. Update or Delete Records
+
+Update a record by ID:
+
+```bash
+fintrack update 5 -a 200 -d "Revised amount"
+```
+
+Delete a record by ID:
+
+```bash
+fintrack delete 5
+```
+
+Delete all records in a category or subcategory:
+
+```bash
+fintrack delete -C Expenses
+fintrack delete -S Groceries
+```
+
+(Both require confirmation.)
+
+## Common Commands
+
+| Task                          | Command                                                            |
+| ----------------------------- | ------------------------------------------------------------------ |
+| Initialize tracker            | `fintrack init --currency NGN`                                     |
+| Add record (short)            | `fintrack add -c Income -a 4000 -s Wages`                          |
+| Add record (long)             | `fintrack add --category Income --amount 4000 --subcategory Wages` |
+| Update record (short)         | `fintrack update 5 -a 200 -d "Updated"`                            |
+| Update record (long)          | `fintrack update 5 --amount 200 --description "Updated"`           |
+| List all records              | `fintrack list`                                                    |
+| List last 10 (short)          | `fintrack list -l 10`                                              |
+| List last 10 (long)           | `fintrack list --last 10`                                          |
+| Filter by category (short)    | `fintrack list -c Income`                                          |
+| Filter by category (long)     | `fintrack list --category Income`                                  |
+| Filter by date                | `fintrack list --start 01-12-2025 --end 31-12-2025`                |
+| View totals                   | `fintrack total`                                                   |
+| Delete record by ID           | `fintrack delete 5`                                                |
+| Delete by category (short)    | `fintrack delete -C Expenses`                                      |
+| Delete by category (long)     | `fintrack delete --by-cat Expenses`                                |
+| Delete by subcategory (short) | `fintrack delete -S Groceries`                                     |
+| View categories               | `fintrack category list`                                           |
+| View subcategories            | `fintrack subcategory list`                                        |
+| Add subcategory               | `fintrack subcategory add Shopping`                                |
+| Rename subcategory (short)    | `fintrack subcategory update -o Old -n New`                        |
+| Rename subcategory (long)     | `fintrack subcategory update --old Old --new New`                  |
+| Export data (future)          | `fintrack export --path ~/Downloads --type csv`                    |
+| View raw JSON                 | `fintrack dump`                                                    |
+| Clear all data                | `fintrack clear`                                                   |
+| Get help                      | `fintrack help`                                                    |
+
+## Data Formats
+
+**Dates:** DD-MM-YYYY (e.g., `30-12-2025`)
+
+**Amounts:** Positive numbers only (e.g., `4000` or `150.50`)
+
+**Names:** Alphanumeric, start with a letter (e.g., "Groceries", "Utilities_Bill")
+
+## Data Storage
+
+All your data is stored locally:
+
+```
+~/.fintrack/
+├── tracker.json           # Your financial data
+├── config                 # (Future) Configuration
+└── backups/
+    └── tracker.backup.*.json  # Automatic backups for recovery
+```
+
+You can safely back up the entire `~/.fintrack/` directory to protect your data.
+
+## Automatic Backups & Recovery
+
+FinTrack automatically creates timestamped backups before any changes. If your data becomes corrupted, FinTrack will automatically restore from the latest backup and notify you.
+
+You can view your current data anytime:
+
+```bash
+fintrack dump
+```
+
+This pretty-prints your `tracker.json` to the terminal.
+
+## Examples
+
+### Track Monthly Income and Expenses
+
+```bash
+# Add monthly salary
+fintrack add --category Income --amount 50000 --subcategory Wages --date 01-12-2025
+
+# Add rent
+fintrack add --category Expenses --amount 20000 --subcategory Housing --date 01-12-2025
+
+# Add groceries
+fintrack add --category Expenses --amount 5000 --subcategory Groceries --date 10-12-2025
+fintrack add --category Expenses --amount 4500 --subcategory Groceries --date 20-12-2025
+
+# View summary
+fintrack total
+
+# See expenses by category
+fintrack list --category Expenses
+```
+
+### Review Last Week's Spending
+
+```bash
+fintrack list --last 7
+```
+
+### See Income for the Year
+
+```bash
+fintrack list --category Income --start 01-01-2025 --end 31-12-2025
+```
+
+### Correct a Mistake
+
+```bash
+fintrack list --last 5        # Find the wrong record
+fintrack update 42 --amount 300  # Correct it
+```
+
+## Keyboard Shortcuts & Tips
+
+- Use `fintrack help` to see all available commands
+- Flag order doesn't matter: `--category Income --amount 4000` is the same as `--amount 4000 --category Income`
+- Category and subcategory names are case-insensitive (use "wages", "Wages", or "WAGES"—all work)
+- Dates default to today if not specified
+- Descriptions are optional but helpful for future reference
+
+## Troubleshooting
+
+### "Tracker already initialized"
+
+You've already run `fintrack init` once. If you want to start fresh, run:
+
+```bash
+fintrack clear
+```
+
+Then `fintrack init` again.
+
+### "Subcategory does not exist"
+
+View all available subcategories:
+
+```bash
+fintrack subcategory list
+```
+
+Then use the exact name from the list.
+
+### "Cannot delete subcategory—it has X records"
+
+You must delete all records in that subcategory first, or delete the subcategory and all its records at once:
+
+```bash
+fintrack delete --by-subcat Groceries
+```
+
+### Data seems corrupted or missing
+
+FinTrack automatically detected corruption and restored from the latest backup. Run:
+
+```bash
+fintrack dump
+```
+
+to inspect your data. If something is still wrong, contact support or check GitHub issues.
+
+## Future Features
+
+Coming soon:
+
+- **Describe command:** Exploratory data analysis (EDA) of your spending
+- **CSV Export:** Export your data to CSV for use in Excel or other tools
+- **Shell Autocompletion:** Tab-complete commands and category names
+- **Configuration file:** Customize defaults and display preferences
+
+## Contributing
+
+Found a bug? Want a feature? Open an issue or pull request on [GitHub](https://github.com/yourusername/fintrack).
+
+## License
+
+MIT License. See LICENSE file for details.
+
+---
+
+## Want to Know More?
+
+Interested in the technical design and architecture decisions behind FinTrack? Check out the **[Design Document](./docs/design.md)** for a comprehensive deep-dive into how I plan to build tool, including data structures, error handling, backup strategies, and the reasoning behind each decision.
+
+---
+
+**Get started now:** `fintrack init --currency NGN`
