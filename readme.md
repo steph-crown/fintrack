@@ -20,7 +20,7 @@ A local-first CLI financial tracker written in Rust. Track your income and expen
 Requires Rust 1.70+. [Install Rust here](https://www.rust-lang.org/tools/install).
 
 ```bash
-git clone https://github.com/yourusername/fintrack.git
+git clone https://github.com/steph-crown/fintrack.git
 cd fintrack
 cargo install --path .
 ```
@@ -311,7 +311,7 @@ Coming soon:
 
 ## Contributing
 
-Found a bug? Want a feature? Open an issue or pull request on [GitHub](https://github.com/yourusername/fintrack).
+Found a bug? Want a feature? Open an issue or pull request on [GitHub](https://github.com/steph-crown/fintrack).
 
 ## License
 
