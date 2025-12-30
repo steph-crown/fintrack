@@ -1,6 +1,7 @@
 pub mod commands;
 pub mod error;
 pub mod model;
+pub mod output;
 pub mod utils;
 
 // Re-export commonly used items at crate root for convenience

@@ -9,7 +9,8 @@ pub fn cli() -> Command {
       Arg::new("currency")
         .short('c')
         .long("currency")
-        .value_parser(clap::value_parser!(Currency)),
+        .value_parser(clap::value_parser!(Currency))
+        .default_value("ngn"),
     )
 }
 
