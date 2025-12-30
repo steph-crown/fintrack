@@ -4,16 +4,23 @@ use crate::parsers::parse_date;
 use crate::{Category, CliResponse, CliResult, GlobalContext};
 
 pub fn cli() -> Command {
-  Command::new("add")
-    .about("Record a new income or expense transaction")
+  Command::new("update")
+    .about("Modify an existing record")
+    .arg(
+      Arg::new("record_id")
+        .index(1)
+        .value_parser(clap::value_parser!(usize)),
+    )
     .arg(
       Arg::new("category")
-        .index(1)
+        .short('c')
+        .long("category")
         .value_parser(clap::value_parser!(Category)),
     )
     .arg(
       Arg::new("amount")
-        .index(2)
+        .short('a')
+        .long("amount")
         .value_parser(clap::value_parser!(f64)),
     )
     .arg(
