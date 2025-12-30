@@ -1,4 +1,4 @@
-# FinTrack
+# FinTrack [in progress]
 
 > _described below is what i plan for this tool to be able to do. i'll update with what's done as i progress_
 
