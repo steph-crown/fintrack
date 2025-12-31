@@ -6,7 +6,7 @@ pub fn cli() -> Command {
   Command::new("subcategory")
     .about("Manage subcategories: list, add, delete, or rename")
     .subcommand_required(true)
-    .subcommands([list::cli()])
+    .subcommands(build_cli())
 }
 
 pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
@@ -16,16 +16,21 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
 
       exec_fn(gctx, sub_args)
     }
-    // Some((_, _)) => Err(crate::CliError {}), // Unknown subcommand
     None => Err(crate::CliError {}), // Shouldn't happen due to subcommand_required
   }
 }
 
-pub fn build_exec(cmd: &str) -> Option<Exec> {
+fn build_cli() -> Vec<Command> {
+  vec![add::cli(), list::cli()]
+}
+
+fn build_exec(cmd: &str) -> Option<Exec> {
   match cmd {
+    "add" => Some(add::exec),
     "list" => Some(list::exec),
     _ => None,
   }
 }
 
+pub mod add;
 pub mod list;
