@@ -6,6 +6,7 @@ pub type Exec = fn(&mut GlobalContext, &ArgMatches) -> CliResult;
 pub fn cli() -> Vec<Command> {
   vec![
     add::cli(),
+    category::cli(),
     clear::cli(),
     delete::cli(),
     describe::cli(),
@@ -21,6 +22,7 @@ pub fn cli() -> Vec<Command> {
 pub fn build_exec(cmd: &str) -> Option<Exec> {
   match cmd {
     "add" => Some(add::exec),
+    "category" => Some(category::exec),
     "clear" => Some(clear::exec),
     "delete" => Some(delete::exec),
     "describe" => Some(describe::exec),
@@ -35,6 +37,7 @@ pub fn build_exec(cmd: &str) -> Option<Exec> {
 }
 
 pub mod add;
+pub mod category;
 pub mod clear;
 pub mod delete;
 pub mod describe;
