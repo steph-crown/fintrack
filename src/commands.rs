@@ -14,6 +14,7 @@ pub fn cli() -> Vec<Command> {
     export::cli(),
     init::cli(),
     list::cli(),
+    subcategory::cli(),
     total::cli(),
     update::cli(),
   ]
@@ -30,6 +31,7 @@ pub fn build_exec(cmd: &str) -> Option<Exec> {
     "export" => Some(export::exec),
     "init" => Some(init::exec),
     "list" => Some(list::exec),
+    "subcategory" => Some(subcategory::exec),
     "total" => Some(total::exec),
     "update" => Some(update::exec),
     _ => None,
@@ -45,5 +47,6 @@ pub mod dump;
 pub mod export;
 pub mod init;
 pub mod list;
+pub mod subcategory;
 pub mod total;
 pub mod update;
