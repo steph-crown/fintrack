@@ -8,6 +8,8 @@ pub fn cli() -> Vec<Command> {
     add::cli(),
     clear::cli(),
     delete::cli(),
+    describe::cli(),
+    dump::cli(),
     init::cli(),
     list::cli(),
     total::cli(),
@@ -20,6 +22,8 @@ pub fn build_exec(cmd: &str) -> Option<Exec> {
     "add" => Some(add::exec),
     "clear" => Some(clear::exec),
     "delete" => Some(delete::exec),
+    "describe" => Some(describe::exec),
+    "dump" => Some(dump::exec),
     "init" => Some(init::exec),
     "list" => Some(list::exec),
     "total" => Some(total::exec),
@@ -31,6 +35,8 @@ pub fn build_exec(cmd: &str) -> Option<Exec> {
 pub mod add;
 pub mod clear;
 pub mod delete;
+pub mod describe;
+pub mod dump;
 pub mod init;
 pub mod list;
 pub mod total;
