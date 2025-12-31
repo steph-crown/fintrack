@@ -30,3 +30,10 @@ pub enum Category {
   Income,
   Expenses,
 }
+
+#[derive(clap::ValueEnum, Clone, Debug)]
+pub enum ExportFileType {
+  JSON,
+  PDF,
+  CSV,
+}
