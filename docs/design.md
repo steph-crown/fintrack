@@ -774,6 +774,11 @@ fn format_error(error: &ProcessError) -> String {
                         reason
                     )
                 }
+                ValidationErrorKind::TrackerAlreadyInitialized => {
+                    "✗ ValidationError: Tracker already initialized\n\
+                    Suggestion: Run 'fintrack clear' to start fresh, or use a different tracker location"
+                        .to_string()
+                }
             }
         }
         ProcessError::FileNotFound(msg) => {

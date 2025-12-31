@@ -15,6 +15,8 @@ pub fn cli() -> Command {
 }
 
 pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
+  // attempt to create file
+  // if file already exists, return an Err
   println!("{:#?} fuck {:#?}", gctx, args);
   Ok(CliResponse { success: true })
 }
