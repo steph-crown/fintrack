@@ -1,4 +1,4 @@
-use clap::{Arg, ArgAction, ArgMatches, Command};
+use clap::{Arg, ArgAction, ArgGroup, ArgMatches, Command};
 
 use crate::{Category, CliResponse, CliResult, GlobalContext};
 
@@ -27,6 +27,12 @@ pub fn cli() -> Command {
         .short('s')
         .long("subcategory")
         .value_parser(clap::value_parser!(String)),
+    )
+    .group(
+      ArgGroup::new("delete_by")
+        .args(["ids", "by-cat", "by-subcat"])
+        .multiple(false)
+        .required(true),
     )
 }
 
