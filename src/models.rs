@@ -52,12 +52,11 @@ pub enum ExportFileType {
   CSV,
 }
 
-// src/models.rs
-
-pub fn default_tracker_json(currency: &Currency) -> serde_json::Value {
+pub fn default_tracker_json(currency: &Currency, balance: f64) -> serde_json::Value {
   serde_json::json!({
       "version": 1,
       "currency": currency.to_string(),
+      "balance": balance,
       "created_at": chrono::Utc::now().to_rfc3339(),
       "last_modified": chrono::Utc::now().to_rfc3339(),
       "categories": {
@@ -70,7 +69,6 @@ pub fn default_tracker_json(currency: &Currency) -> serde_json::Value {
       "subcategories_by_name": {
           "Miscellaneous": 1
       },
-      "next_subcategory_id": 2,
       "records": [],
       "next_record_id": 1
   })
