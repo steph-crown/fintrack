@@ -53,6 +53,7 @@ pub enum CliError {
     backup_restored: bool,
     timestamp: String,
   },
+  FileAlreadyExists,
   Other(String),
 }
 
@@ -65,6 +66,17 @@ impl CliError {
   /// Write this error to the given writer
   pub fn write_to(&self, writer: &mut impl std::io::Write) {
     output::write_error(self, writer);
+  }
+}
+
+impl From<std::io::Error> for CliError {
+  fn from(err: std::io::Error) -> Self {
+    match err.kind() {
+      std::io::ErrorKind::NotFound => CliError::FileNotFound(err.to_string()),
+      std::io::ErrorKind::PermissionDenied => CliError::PermissionDenied(err.to_string()),
+      std::io::ErrorKind::AlreadyExists => CliError::FileAlreadyExists,
+      _ => CliError::Other(format!("IO error: {}", err)),
+    }
   }
 }
 

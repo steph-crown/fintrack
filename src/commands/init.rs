@@ -1,6 +1,10 @@
+use std::io::prelude::*;
+use std::{fs::File, path::Path};
+
 use clap::{Arg, ArgMatches, Command};
 
-use crate::{CliResponse, CliResult, Currency, GlobalContext};
+use crate::utils::file::create_file_if_not_exists;
+use crate::{CliError, CliResponse, CliResult, Currency, GlobalContext};
 
 pub fn cli() -> Command {
   Command::new("init")
@@ -15,8 +19,8 @@ pub fn cli() -> Command {
 }
 
 pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
-  // attempt to create file
-  // if file already exists, return an Err
+  let mut file = create_file_if_not_exists(gctx.tracker_path())?;
+
   println!("{:#?} fuck {:#?}", gctx, args);
   Ok(CliResponse { success: true })
 }

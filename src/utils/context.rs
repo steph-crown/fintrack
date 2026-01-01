@@ -24,4 +24,8 @@ impl GlobalContext {
       backups_path,
     }
   }
+
+  pub fn tracker_path(&self) -> &PathBuf {
+    &self.tracker_path
+  }
 }
