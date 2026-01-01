@@ -1,6 +1,6 @@
 pub mod commands;
 pub mod error;
-pub mod model;
+pub mod models;
 pub mod output;
 pub mod utils;
 
@@ -12,4 +12,4 @@ pub use utils::parsers;
 
 // model
 pub use error::*;
-pub use model::*;
+pub use models::*;

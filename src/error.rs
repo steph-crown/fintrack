@@ -80,6 +80,12 @@ impl From<std::io::Error> for CliError {
   }
 }
 
+impl From<serde_json::Error> for CliError {
+  fn from(err: serde_json::Error) -> Self {
+    CliError::InvalidJson(err.to_string())
+  }
+}
+
 pub fn invalid_subcommand_error(cmd: &str) -> CliError {
   CliError::ValidationError(ValidationErrorKind::InvalidSubcommand {
     subcommand: cmd.to_string(),
