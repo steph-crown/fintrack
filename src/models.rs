@@ -29,14 +29,25 @@ impl CliResponse {
   }
 }
 
-pub enum Total {}
+// #[derive(D)]
+pub struct Total {
+  pub opening_balance: f64,
+  pub income_total: f64,
+  pub expenses_total: f64,
+}
+
+impl Total {
+  pub fn total(&self) -> f64 {
+    self.opening_balance + self.income_total + self.expenses_total
+  }
+}
 
 pub enum ResponseContent {
   Message(String),   // For: "Data cleared!" or "Transaction added!"
   Record(Record),    // For: Showing the one you just created
   List(Vec<Record>), // For: The 'list' or 'history' command
   TrackerData(TrackerData),
-  // Total(),
+  Total(Total),
 }
 
 pub type CliResult = Result<CliResponse, CliError>;

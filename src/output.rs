@@ -38,6 +38,16 @@ pub fn write_response(res: &CliResponse, writer: &mut impl std::io::Write) -> io
     ResponseContent::TrackerData(tracker_data) => {
       writeln!(writer, "{:#?}", tracker_data)?;
     }
+    ResponseContent::Total(totals) => {
+      writeln!(
+        writer,
+        "Opening balance: {}\nTotal Income: {}\nTotal Expenses: {}\n--------------------------------\nTOTAL: {}",
+        totals.opening_balance,
+        totals.income_total,
+        totals.expenses_total,
+        totals.total()
+      )?;
+    }
   }
 
   Ok(())
