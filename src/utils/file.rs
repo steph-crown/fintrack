@@ -36,6 +36,16 @@ pub trait FilePath: AsRef<Path> {
   fn open_read_write(&self) -> io::Result<File> {
     File::options().read(true).write(true).open(self.as_ref())
   }
+
+  fn delete_if_exists(&self) -> io::Result<()> {
+    let path = self.as_ref();
+    if path.is_dir() {
+      fs::remove_dir_all(path)?;
+    } else {
+      fs::remove_file(path)?;
+    }
+    Ok(())
+  }
 }
 
 impl<P: AsRef<Path>> FilePath for P {}

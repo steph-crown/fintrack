@@ -126,6 +126,7 @@ pub fn default_tracker_json(currency: &Currency, balance: f64) -> serde_json::Va
           "miscellaneous": 1
       },
       "records": [],
-      "next_record_id": 1
+      "next_record_id": 1,
+      "next_subcategory_id": 2
   })
 }
