@@ -42,7 +42,7 @@ impl<'a> ArgMatchesExt for ArgMatches {
 
   fn value_of_date(&self, id: &str) -> Option<String> {
     self
-      .get_one::<chrono::NaiveDate>("date")
+      .get_one::<chrono::NaiveDate>(id)
       .map(|d| d.format("%d-%m-%Y").to_string())
   }
 }
