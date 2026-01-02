@@ -555,10 +555,11 @@ fintrack total
 - Output:
   ```
   Financial Summary:
+    Initial Balance:     300.00 NGN
     Total Income:    125,500.00 NGN
     Total Expenses:   45,230.50 NGN
     ──────────────────────────────
-    Net Balance:      80,269.50 NGN
+    Net Balance:      80,569.50 NGN
   ```
 
 ---
