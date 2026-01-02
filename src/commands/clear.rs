@@ -8,5 +8,5 @@ pub fn cli() -> Command {
 
 pub fn exec(gctx: &mut GlobalContext, _args: &ArgMatches) -> CliResult {
   gctx.base_path().delete_if_exists()?;
-  Ok(CliResponse {})
+  Ok(CliResponse::success())
 }

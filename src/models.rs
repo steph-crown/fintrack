@@ -2,13 +2,38 @@ use crate::{CliError, output};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub struct CliResponse {}
+pub struct CliResponse {
+  content: Option<ResponseContent>,
+}
+
+impl CliResponse {
+  pub fn new(content: ResponseContent) -> Self {
+    Self {
+      content: Some(content),
+    }
+  }
+
+  pub fn success() -> Self {
+    Self { content: None }
+  }
+
+  pub fn content(self) -> Option<ResponseContent> {
+    self.content
+  }
+}
 
 impl CliResponse {
   /// Write this response to the given writer
   pub fn write_to(&self, writer: &mut impl std::io::Write) {
     output::write_response(self, writer);
   }
+}
+
+pub enum ResponseContent {
+  Message(String),   // For: "Data cleared!" or "Transaction added!"
+  Record(Record),    // For: Showing the one you just created
+  List(Vec<Record>), // For: The 'list' or 'history' command
+  TrackerData(TrackerData),
 }
 
 pub type CliResult = Result<CliResponse, CliError>;
