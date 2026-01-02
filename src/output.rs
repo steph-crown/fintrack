@@ -1,43 +1,44 @@
+use std::io;
+
 use crate::{CliError, CliResponse, ResponseContent};
 
 /// Write a CLI error to the given writer
-pub fn write_error(err: &CliError, writer: &mut impl std::io::Write) {
+pub fn write_error(err: &CliError, writer: &mut impl std::io::Write) -> io::Result<()> {
   // TODO: Implement error formatting
-  let _ = writeln!(writer, "Error: {:?}", err);
+  writeln!(writer, "Error: {:?}", err)?;
+
+  Ok(())
 }
 
 /// Write a CLI response to the given writer
-pub fn write_response(res: &CliResponse, writer: &mut impl std::io::Write) {
+pub fn write_response(res: &CliResponse, writer: &mut impl std::io::Write) -> io::Result<()> {
   // TODO: Implement response formatting
-  let _ = writeln!(writer, "Success");
 
-  let Some(content) = &res.content() else {
-    writeln!(writer, "Success");
-    return;
+  let Some(content) = res.content() else {
+    writeln!(writer, "Success")?;
+    return Ok(());
   };
 
   match content {
     ResponseContent::Message(msg) => {
-      writeln!(writer, "{}", msg).unwrap();
+      writeln!(writer, "{}", msg)?;
     }
     ResponseContent::Record(t) => {
       writeln!(
         writer,
         "Created Transaction: {} - ${}",
         t.description, t.amount
-      )
-      .unwrap();
+      )?;
     }
     ResponseContent::List(list) => {
       for item in list {
-        writeln!(writer, "- {}", item.description).unwrap();
+        writeln!(writer, "- {}", item.description)?;
       }
     }
     ResponseContent::TrackerData(tracker_data) => {
-      writeln!(writer, "{:#?}", tracker_data);
-    }
-    _ => {
-      writeln!(writer, "Success");
+      writeln!(writer, "{:#?}", tracker_data)?;
     }
   }
+
+  Ok(())
 }

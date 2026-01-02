@@ -1,3 +1,5 @@
+use std::io;
+
 use clap::Command;
 use fintrack::{GlobalContext, commands};
 
@@ -31,13 +33,13 @@ fn run() -> Result<(), String> {
   let exec_fn = commands::build_exec(cmd).ok_or_else(|| format!("Unknown command: {}", cmd))?;
 
   let exec_result = exec_fn(&mut gctx, args);
-  // .map_err(|_| "Command execution failed".to_string())?;
-  process_result(&exec_result);
+  // the error expected here is not CliError, it is an io error that occured as CliResponse or CliError is being written to stdout
+  process_result(&exec_result).expect("An error occured displaying response");
 
   Ok(())
 }
 
-fn process_result(result: &fintrack::CliResult) {
+fn process_result(result: &fintrack::CliResult) -> io::Result<()> {
   match result {
     Ok(res) => res.write_to(&mut std::io::stdout()),
     Err(err) => err.write_to(&mut std::io::stderr()),

@@ -1,3 +1,5 @@
+use std::io;
+
 use crate::output;
 
 #[derive(Debug)]
@@ -64,8 +66,8 @@ pub enum CliError {
 
 impl CliError {
   /// Write this error to the given writer
-  pub fn write_to(&self, writer: &mut impl std::io::Write) {
-    output::write_error(self, writer);
+  pub fn write_to(&self, writer: &mut impl std::io::Write) -> io::Result<()> {
+    output::write_error(self, writer)
   }
 }
 

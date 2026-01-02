@@ -1,6 +1,6 @@
-use clap::{Arg, ArgAction, ArgMatches, Command};
+use clap::{ArgMatches, Command};
 
-use crate::{Category, CliResponse, CliResult, GlobalContext};
+use crate::{CliResponse, CliResult, GlobalContext};
 
 pub fn cli() -> Command {
   Command::new("total").about("Display total income, expenses, and net balance")

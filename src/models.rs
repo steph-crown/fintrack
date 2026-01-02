@@ -1,6 +1,6 @@
 use crate::{CliError, output};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::{collections::HashMap, io};
 
 pub struct CliResponse {
   content: Option<ResponseContent>,
@@ -17,15 +17,15 @@ impl CliResponse {
     Self { content: None }
   }
 
-  pub fn content(self) -> Option<ResponseContent> {
-    self.content
+  pub fn content(&self) -> Option<&ResponseContent> {
+    self.content.as_ref()
   }
 }
 
 impl CliResponse {
   /// Write this response to the given writer
-  pub fn write_to(&self, writer: &mut impl std::io::Write) {
-    output::write_response(self, writer);
+  pub fn write_to(&self, writer: &mut impl std::io::Write) -> io::Result<()> {
+    output::write_response(self, writer)
   }
 }
 
