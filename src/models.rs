@@ -130,6 +130,18 @@ impl TrackerData {
   pub fn subcategory_id(&self, name: &str) -> Option<usize> {
     self.subcategories_by_name.get(name).copied()
   }
+
+  pub fn totals(&self) -> (f64, f64) {
+    self.records.iter().fold((0.0, 0.0), |mut acc, r| {
+      if r.category == 1 {
+        acc.0 += r.amount;
+      } else {
+        acc.1 += r.amount;
+      }
+
+      acc
+    })
+  }
 }
 
 pub fn default_tracker_json(currency: &Currency, opening_balance: f64) -> serde_json::Value {
