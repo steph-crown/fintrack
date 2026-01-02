@@ -15,19 +15,19 @@ pub fn cli() -> Command {
         .default_value("ngn"),
     )
     .arg(
-      Arg::new("balance")
-        .short('b')
-        .long("balance")
+      Arg::new("opening")
+        .short('o')
+        .long("opening")
         .value_parser(clap::value_parser!(f64)),
     )
 }
 
 pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   let currency = args.value_of_currency_or_def("currency");
-  let balance = args.value_of_f64_or_zero("balance");
+  let opening_balance = args.value_of_f64_or_zero("opening");
   let mut file = gctx.tracker_path().create_file_if_not_exists()?;
 
-  let default_json = default_tracker_json(currency, *balance);
+  let default_json = default_tracker_json(currency, *opening_balance);
   write_json_to_file(&default_json, &mut file)?;
 
   Ok(CliResponse::success())

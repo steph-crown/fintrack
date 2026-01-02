@@ -29,11 +29,14 @@ impl CliResponse {
   }
 }
 
+pub enum Total {}
+
 pub enum ResponseContent {
   Message(String),   // For: "Data cleared!" or "Transaction added!"
   Record(Record),    // For: Showing the one you just created
   List(Vec<Record>), // For: The 'list' or 'history' command
   TrackerData(TrackerData),
+  // Total(),
 }
 
 pub type CliResult = Result<CliResponse, CliError>;
@@ -101,7 +104,7 @@ pub struct TrackerData {
   pub currency: String,
   pub created_at: String,
   pub last_modified: String,
-  pub balance: f64,
+  pub opening_balance: f64,
   pub categories: HashMap<String, usize>,
   pub subcategories_by_id: HashMap<usize, String>,
   pub subcategories_by_name: HashMap<String, usize>,
@@ -130,11 +133,11 @@ impl TrackerData {
   }
 }
 
-pub fn default_tracker_json(currency: &Currency, balance: f64) -> serde_json::Value {
+pub fn default_tracker_json(currency: &Currency, opening_balance: f64) -> serde_json::Value {
   serde_json::json!({
       "version": 1,
       "currency": currency.to_string(),
-      "balance": balance,
+      "opening_balance": opening_balance,
       "created_at": chrono::Utc::now().to_rfc3339(),
       "last_modified": chrono::Utc::now().to_rfc3339(),
       "categories": {
