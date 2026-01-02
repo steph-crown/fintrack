@@ -89,7 +89,7 @@ pub enum ExportFileType {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Record {
-  pub id: u64,
+  pub id: usize,
   pub category: usize,    // ID from categories map
   pub subcategory: usize, // ID from subcategories map
   pub description: String,
@@ -109,7 +109,7 @@ pub struct TrackerData {
   pub subcategories_by_name: HashMap<String, usize>,
   next_subcategory_id: u32,
   pub records: Vec<Record>,
-  pub next_record_id: u64,
+  pub next_record_id: usize,
 }
 
 impl TrackerData {
