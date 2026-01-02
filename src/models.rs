@@ -2,10 +2,7 @@ use crate::{CliError, output};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub struct CliResponse {
-  pub success: bool,
-  // stdout:
-}
+pub struct CliResponse {}
 
 impl CliResponse {
   /// Write this response to the given writer

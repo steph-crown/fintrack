@@ -8,5 +8,5 @@ pub fn cli() -> Command {
 
 pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   println!("{:#?} fucklist {:#?}", gctx, args);
-  Ok(CliResponse { success: true })
+  Ok(CliResponse {  })
 }

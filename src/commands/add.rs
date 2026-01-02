@@ -83,5 +83,5 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   let tracker_json = serde_json::json!(tracker_data);
   write_json_to_file(&tracker_json, &mut file)?;
 
-  Ok(CliResponse { success: true })
+  Ok(CliResponse {  })
 }

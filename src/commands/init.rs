@@ -30,5 +30,5 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   let default_json = default_tracker_json(currency, *balance);
   write_json_to_file(&default_json, &mut file)?;
 
-  Ok(CliResponse { success: true })
+  Ok(CliResponse {  })
 }

@@ -1,6 +1,6 @@
-use clap::{Arg, ArgAction, ArgMatches, Command};
+use clap::{ArgMatches, Command};
 
-use crate::{Category, CliResponse, CliResult, GlobalContext};
+use crate::{CliResponse, CliResult, GlobalContext};
 
 pub fn cli() -> Command {
   Command::new("dump").about("Pretty-print the raw JSON data to stdout")
@@ -8,5 +8,7 @@ pub fn cli() -> Command {
 
 pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   println!("{:#?} fuck {:#?}", gctx, args);
-  Ok(CliResponse { success: true })
+
+  // read it
+  Ok(CliResponse {})
 }
