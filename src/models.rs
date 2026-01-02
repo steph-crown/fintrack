@@ -1,4 +1,6 @@
 use crate::{CliError, output};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 pub struct CliResponse {
   pub success: bool,
@@ -45,11 +47,65 @@ pub enum Category {
   Expenses,
 }
 
+impl std::fmt::Display for Category {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match self {
+      Category::Income => write!(f, "income"),
+      Category::Expenses => write!(f, "expenses"),
+    }
+  }
+}
+
 #[derive(clap::ValueEnum, Clone, Debug)]
 pub enum ExportFileType {
   JSON,
   PDF,
   CSV,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Record {
+  pub id: u64,
+  pub category: usize,    // ID from categories map
+  pub subcategory: usize, // ID from subcategories map
+  pub description: String,
+  pub amount: f64,  // Always positive; sign determined by category
+  pub date: String, // Format: DD-MM-YYYY
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct TrackerData {
+  pub version: u32,
+  pub currency: String,
+  pub created_at: String,
+  pub last_modified: String,
+  pub balance: f64,
+  pub categories: HashMap<String, usize>,
+  pub subcategories_by_id: HashMap<usize, String>,
+  pub subcategories_by_name: HashMap<String, usize>,
+  next_subcategory_id: u32,
+  pub records: Vec<Record>,
+  pub next_record_id: u64,
+}
+
+impl TrackerData {
+  pub fn push_record(&mut self, record: Record) -> &Self {
+    self.records.push(record);
+
+    self
+  }
+
+  pub fn category_id(&self, category: &str) -> usize {
+    self.categories[category]
+  }
+
+  pub fn miscellaneous_subcategory_id(&self) -> Option<usize> {
+    self.subcategories_by_name.get("miscellaneous").copied()
+  }
+
+  pub fn subcategory_id(&self, name: &str) -> Option<usize> {
+    self.subcategories_by_name.get(name).copied()
+  }
 }
 
 pub fn default_tracker_json(currency: &Currency, balance: f64) -> serde_json::Value {
@@ -60,14 +116,14 @@ pub fn default_tracker_json(currency: &Currency, balance: f64) -> serde_json::Va
       "created_at": chrono::Utc::now().to_rfc3339(),
       "last_modified": chrono::Utc::now().to_rfc3339(),
       "categories": {
-          "Income": 1,
-          "Expenses": 2
+          "income": 1,
+          "expenses": 2
       },
       "subcategories_by_id": {
-          "1": "Miscellaneous"
+          "1": "miscellaneous"
       },
       "subcategories_by_name": {
-          "Miscellaneous": 1
+          "miscellaneous": 1
       },
       "records": [],
       "next_record_id": 1

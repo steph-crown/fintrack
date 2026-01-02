@@ -28,4 +28,20 @@ impl GlobalContext {
   pub fn tracker_path(&self) -> &PathBuf {
     &self.tracker_path
   }
+
+  pub fn home_path(&self) -> &PathBuf {
+    &self.home_path
+  }
+
+  pub fn base_path(&self) -> &PathBuf {
+    &self.base_path
+  }
+
+  pub fn config_path(&self) -> &PathBuf {
+    &self.config_path
+  }
+
+  pub fn backups_path(&self) -> &PathBuf {
+    &self.backups_path
+  }
 }
