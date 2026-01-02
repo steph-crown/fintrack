@@ -41,11 +41,15 @@ pub fn write_response(res: &CliResponse, writer: &mut impl std::io::Write) -> io
     ResponseContent::Total(totals) => {
       writeln!(
         writer,
-        "Opening balance: {}\nTotal Income: {}\nTotal Expenses: {}\n--------------------------------\nTOTAL: {}",
+        "Opening balance: {} {}\nTotal Income: {} {}\nTotal Expenses: {} {}\n--------------------------------\nTOTAL: {} {}",
         totals.opening_balance,
+        totals.currency,
         totals.income_total,
+        totals.currency,
         totals.expenses_total,
-        totals.total()
+        totals.currency,
+        totals.total(),
+        totals.currency
       )?;
     }
   }

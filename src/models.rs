@@ -31,6 +31,7 @@ impl CliResponse {
 
 // #[derive(D)]
 pub struct Total {
+  pub currency: Currency,
   pub opening_balance: f64,
   pub income_total: f64,
   pub expenses_total: f64,
@@ -52,7 +53,8 @@ pub enum ResponseContent {
 
 pub type CliResult = Result<CliResponse, CliError>;
 
-#[derive(clap::ValueEnum, Clone, Debug)]
+#[derive(clap::ValueEnum, Clone, Debug, strum::Display, strum::EnumString)]
+#[strum(serialize_all = "UPPERCASE", ascii_case_insensitive)]
 pub enum Currency {
   NGN,
   USD,
@@ -61,20 +63,6 @@ pub enum Currency {
   CAD,
   AUD,
   JPY,
-}
-
-impl std::fmt::Display for Currency {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    match self {
-      Currency::NGN => write!(f, "NGN"),
-      Currency::USD => write!(f, "USD"),
-      Currency::GBP => write!(f, "GBP"),
-      Currency::EUR => write!(f, "EUR"),
-      Currency::CAD => write!(f, "CAD"),
-      Currency::AUD => write!(f, "AUD"),
-      Currency::JPY => write!(f, "JPY"),
-    }
-  }
 }
 
 #[derive(clap::ValueEnum, Clone, Debug)]
