@@ -6,7 +6,7 @@ authors = ["Stephen Emmanuel <emmanuelstephen024@gmail.com>"]
 description = "A local-first CLI financial tracker for managing income and expenses"
 license = "MIT"
 repository = "https://github.com/steph-crown/fintrack"
-keywords = ["finance", "tracker", "cli", "budget", "expenses", "income"]
+keywords = ["finance", "tracker", "cli", "expenses", "income"]
 categories = ["command-line-utilities", "financial"]
 homepage = "https://github.com/steph-crown/fintrack/readme.md"
 
