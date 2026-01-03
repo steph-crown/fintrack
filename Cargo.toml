@@ -10,6 +10,12 @@ keywords = ["finance", "tracker", "cli", "expenses", "income"]
 categories = ["command-line-utilities"]
 homepage = "https://github.com/steph-crown/fintrack/readme.md"
 
+[package.metadata.wix]
+upgrade-guid = "16FA7B2F-0A0B-4749-8982-FD92DB7041E5"
+path-guid = "B52FCE48-179F-4203-95BF-51BDEF9E5356"
+license = false
+eula = false
+
 [dependencies]
 chrono = "0.4.42"
 clap = { version = "4.5.53", features = ["derive"] }
@@ -23,3 +29,8 @@ tabled = "0.15"
 
 [dev-dependencies]
 tempfile = "3.10"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
