@@ -45,8 +45,8 @@ impl Total {
 
 pub enum ResponseContent {
   Message(String),   // For: "Data cleared!" or "Transaction added!"
-  Record(Record),    // For: Showing the one you just created
-  List(Vec<Record>), // For: The 'list' or 'history' command
+  Record { record: Record, tracker_data: TrackerData },    // For: Showing the one you just created
+  List { records: Vec<Record>, tracker_data: TrackerData }, // For: The 'list' or 'history' command
   TrackerData(TrackerData),
   Total(Total),
 }
@@ -129,6 +129,14 @@ impl TrackerData {
 
   pub fn subcategory_id(&self, name: &str) -> Option<usize> {
     self.subcategories_by_name.get(name).copied()
+  }
+
+  pub fn category_name(&self, id: usize) -> Option<&String> {
+    self.categories.iter().find(|(_, v)| **v == id).map(|(k, _)| k)
+  }
+
+  pub fn subcategory_name(&self, id: usize) -> Option<&String> {
+    self.subcategories_by_id.get(&id)
   }
 
   pub fn totals(&self) -> (f64, f64) {

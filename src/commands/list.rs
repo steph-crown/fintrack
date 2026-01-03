@@ -105,5 +105,8 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
     }
   }
 
-  Ok(CliResponse::new(ResponseContent::List(filtered_data)))
+  Ok(CliResponse::new(ResponseContent::List {
+    records: filtered_data,
+    tracker_data,
+  }))
 }
