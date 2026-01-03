@@ -4,7 +4,9 @@ use clap::{Arg, ArgMatches, Command};
 use crate::command_prelude::ArgMatchesExt;
 use crate::utils::file::{FilePath, write_json_to_file};
 use crate::utils::parsers::{parse_category, parse_date};
-use crate::{Category, CliError, CliResponse, CliResult, GlobalContext, Record, ResponseContent, TrackerData};
+use crate::{
+  CliError, CliResponse, CliResult, GlobalContext, Record, ResponseContent, TrackerData,
+};
 
 pub fn cli() -> Command {
   Command::new("add")

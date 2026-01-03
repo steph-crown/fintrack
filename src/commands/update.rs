@@ -3,7 +3,7 @@ use clap::{Arg, ArgMatches, Command};
 use crate::command_prelude::ArgMatchesExt;
 use crate::utils::file::{FilePath, write_json_to_file};
 use crate::utils::parsers::{parse_category, parse_date};
-use crate::{Category, CliError, CliResponse, CliResult, GlobalContext, ResponseContent, TrackerData};
+use crate::{CliError, CliResponse, CliResult, GlobalContext, ResponseContent, TrackerData};
 
 pub fn cli() -> Command {
   Command::new("update")
@@ -50,9 +50,9 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   let mut file = gctx.tracker_path().open_read_write()?;
   let mut tracker_data: TrackerData = serde_json::from_reader(&file)?;
 
-  let record_id = args.get_usize("record_id").map_err(|_| {
-    CliError::ValidationError(crate::ValidationErrorKind::RecordNotFound { id: 0 })
-  })?;
+  let record_id = args
+    .get_usize("record_id")
+    .map_err(|_| CliError::ValidationError(crate::ValidationErrorKind::RecordNotFound { id: 0 }))?;
 
   let category_id = args.get_category_opt("category").map(|category| {
     let category_str = category.to_string();

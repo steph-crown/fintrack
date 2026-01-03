@@ -4,7 +4,7 @@ use clap::{Arg, ArgGroup, ArgMatches, Command};
 use crate::command_prelude::ArgMatchesExt;
 use crate::utils::file::FilePath;
 use crate::utils::parsers::{parse_category, parse_date};
-use crate::{Category, CliResponse, CliResult, GlobalContext, Record, ResponseContent, TrackerData};
+use crate::{CliResponse, CliResult, GlobalContext, Record, ResponseContent, TrackerData};
 
 pub fn cli() -> Command {
   Command::new("list")

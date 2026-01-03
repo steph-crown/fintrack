@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use clap::{Arg, ArgAction, ArgGroup, ArgMatches, Command};
 
 use crate::{
-  Category, CliResponse, CliResult, GlobalContext, TrackerData,
+  CliResponse, CliResult, GlobalContext, TrackerData,
   command_prelude::ArgMatchesExt,
   utils::file::{FilePath, write_json_to_file},
   utils::parsers::parse_category,
