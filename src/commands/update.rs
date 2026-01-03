@@ -7,42 +7,55 @@ use crate::{CliError, CliResponse, CliResult, GlobalContext, ResponseContent, Tr
 
 pub fn cli() -> Command {
   Command::new("update")
-    .about("Modify an existing record")
+    .about("Modify an existing transaction record")
+    .long_about("Updates one or more fields of an existing record. Only the fields you specify will be changed; others remain unchanged. Use 'fintrack list' to find record IDs.")
     .arg(
       Arg::new("record_id")
         .index(1)
         .required(true)
-        .value_parser(clap::value_parser!(usize)),
+        .value_parser(clap::value_parser!(usize))
+        .help("The ID of the record to update")
+        .long_help("The unique ID number of the record you want to modify. Use 'fintrack list' to see all records and their IDs."),
     )
     .arg(
       Arg::new("category")
         .short('c')
         .long("category")
-        .value_parser(parse_category),
+        .value_parser(parse_category)
+        .help("Change the category to 'income' or 'expenses'")
+        .long_help("Updates the transaction category. Use 'income' for money received or 'expenses' for money spent. Case-insensitive."),
     )
     .arg(
       Arg::new("amount")
         .short('a')
         .long("amount")
-        .value_parser(clap::value_parser!(f64)),
+        .value_parser(clap::value_parser!(f64))
+        .help("Change the transaction amount (must be greater than 0)")
+        .long_help("Updates the transaction amount. Must be a positive number greater than 0. Examples: 100, 150.50, 2000.75"),
     )
     .arg(
       Arg::new("subcategory")
         .short('s')
         .long("subcategory")
-        .value_parser(clap::value_parser!(String)),
+        .value_parser(clap::value_parser!(String))
+        .help("Change the subcategory name")
+        .long_help("Updates the subcategory. The subcategory must already exist - use 'fintrack subcategory list' to see available subcategories."),
     )
     .arg(
       Arg::new("description")
         .short('d')
         .long("description")
-        .value_parser(clap::value_parser!(String)),
+        .value_parser(clap::value_parser!(String))
+        .help("Change the description or notes")
+        .long_help("Updates the transaction description or notes. You can set this to an empty string to remove the description."),
     )
     .arg(
       Arg::new("date")
         .short('D')
         .long("date")
-        .value_parser(parse_date),
+        .value_parser(parse_date)
+        .help("Change the transaction date (DD-MM-YYYY format)")
+        .long_help("Updates the transaction date. Format: DD-MM-YYYY (e.g., 30-12-2025)."),
     )
 }
 

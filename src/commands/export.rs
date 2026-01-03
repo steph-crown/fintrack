@@ -12,17 +12,20 @@ use crate::{
 
 pub fn cli() -> Command {
   Command::new("export")
-    .about("Export tracker data to CSV or JSON file")
+    .about("Export your tracker data to a file")
+    .long_about("Saves your complete financial data to a file in CSV or JSON format. The file will be created with a timestamp in the filename (e.g., fintrack_export_2025-12-30T14-45-30Z.csv). Useful for backups or importing into other tools.")
     .arg(
       Arg::new("path")
-        .help("Folder path where exported file should be created")
+        .help("Directory where the exported file will be saved")
+        .long_help("The folder path where you want to save the exported file. The directory must exist. The file will be created in this directory with an auto-generated timestamped filename.")
         .index(1)
         .required(true)
         .value_parser(clap::value_parser!(PathBuf)),
     )
     .arg(
       Arg::new("type")
-        .help("The file type the export should be in. Defaults to json.")
+        .help("File format: 'csv' or 'json'")
+        .long_help("The format for the exported file. Use 'csv' for spreadsheet compatibility (Excel, Google Sheets) or 'json' for programmatic access. Defaults to 'json' if not specified.")
         .short('t')
         .long("type")
         .value_parser(clap::value_parser!(ExportFileType))

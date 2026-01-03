@@ -2,23 +2,26 @@ use clap::{Arg, ArgMatches, Command};
 
 use crate::{
   CliError, CliResponse, CliResult, GlobalContext, TrackerData,
-  parsers::parse_label,
   utils::file::{FilePath, write_json_to_file},
+  utils::parsers::parse_label,
 };
 
 pub fn cli() -> Command {
   Command::new("rename")
     .about("Rename an existing subcategory")
+    .long_about("Changes the name of an existing subcategory. All existing records that use this subcategory will automatically use the new name (they reference by ID, not name). The new name must not already exist. You cannot rename 'Miscellaneous' as it's a system subcategory.")
     .arg(
       Arg::new("old")
         .help("Current subcategory name")
+        .long_help("The current name of the subcategory you want to rename. The name is case-insensitive. Use 'fintrack subcategory list' to see available subcategories.")
         .index(1)
         .required(true)
         .value_parser(parse_label),
     )
     .arg(
       Arg::new("new")
-        .help("The name you want to change subcategory to")
+        .help("New name for the subcategory")
+        .long_help("The new name you want to use. Must start with a letter and can contain letters, numbers, and underscores. The name must not already exist. It will be stored in Title Case (first letter uppercase, rest lowercase).")
         .index(2)
         .required(true)
         .value_parser(parse_label),

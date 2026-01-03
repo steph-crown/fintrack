@@ -2,20 +2,22 @@ use clap::{Arg, ArgMatches, Command};
 
 use crate::{
   CliError, CliResponse, CliResult, GlobalContext, TrackerData,
-  parsers::parse_label,
   utils::file::{FilePath, write_json_to_file},
+  utils::parsers::parse_label,
 };
 
 pub fn cli() -> Command {
   Command::new("add")
     .about("Create a new subcategory")
+    .long_about("Adds a custom subcategory to help organize your transactions. The name must start with a letter and can contain letters, numbers, and underscores. Names are case-insensitive but will be stored in Title Case. You cannot create a subcategory named 'Miscellaneous' as it's reserved.")
     .arg(
-      Arg::new("name")
-        .index(1)
+    Arg::new("name")
+      .index(1)
         .required(true)
-        .value_parser(parse_label)
-        .help("Name of subcategory"),
-    )
+      .value_parser(parse_label)
+        .help("Name for the new subcategory")
+        .long_help("The name for your new subcategory. Must start with a letter and can contain letters, numbers, and underscores. Examples: 'Groceries', 'Salary', 'Rent', 'Utilities_Bill'. The name will be stored in Title Case (first letter uppercase, rest lowercase)."),
+  )
 }
 
 pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {

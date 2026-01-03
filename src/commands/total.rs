@@ -6,7 +6,9 @@ use crate::{
 };
 
 pub fn cli() -> Command {
-  Command::new("total").about("Display total income, expenses, and net balance")
+  Command::new("total")
+    .about("Display financial summary with totals")
+    .long_about("Shows a summary of your finances including opening balance, total income, total expenses, and net balance (opening + income - expenses).")
 }
 
 pub fn exec(gctx: &mut GlobalContext, _args: &ArgMatches) -> CliResult {
@@ -14,6 +16,7 @@ pub fn exec(gctx: &mut GlobalContext, _args: &ArgMatches) -> CliResult {
   let tracker_data: TrackerData = serde_json::from_reader(&file)?;
 
   let opening_balance = tracker_data.opening_balance;
+
   let currency = tracker_data
     .currency
     .parse::<Currency>()

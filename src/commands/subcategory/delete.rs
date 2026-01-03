@@ -2,19 +2,21 @@ use clap::{Arg, ArgMatches, Command};
 
 use crate::{
   CliError, CliResponse, CliResult, GlobalContext, TrackerData,
-  parsers::parse_label,
   utils::file::{FilePath, write_json_to_file},
+  utils::parsers::parse_label,
 };
 
 pub fn cli() -> Command {
   Command::new("delete")
-    .about("Delete a subcategory (only if it has no records)")
+    .about("Delete a subcategory")
+    .long_about("Removes a subcategory from your tracker. You can only delete subcategories that have no associated records. If a subcategory has records, you must delete those records first (using 'fintrack delete -s <subcategory>') or delete the subcategory manually. The 'Miscellaneous' subcategory cannot be deleted as it's a system subcategory.")
     .arg(
       Arg::new("name")
         .index(1)
         .required(true)
         .value_parser(parse_label)
-        .help("Name of subcategory"),
+        .help("Name of the subcategory to delete")
+        .long_help("The name of the subcategory you want to remove. The name is case-insensitive. Use 'fintrack subcategory list' to see available subcategories. If the subcategory has records, you'll get an error message telling you how many records need to be deleted first."),
     )
 }
 

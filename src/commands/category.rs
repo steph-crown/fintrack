@@ -4,7 +4,8 @@ use crate::{CliResult, GlobalContext, commands::Exec, invalid_subcommand_error};
 
 pub fn cli() -> Command {
   Command::new("category")
-    .about("Manage categories")
+    .about("View available categories")
+    .long_about("Categories are fixed and cannot be modified. There are only two categories: Income and Expenses. Use this command to view them.")
     .subcommand_required(true)
     .subcommands([list::cli()])
 }

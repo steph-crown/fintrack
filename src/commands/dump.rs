@@ -5,7 +5,9 @@ use crate::{
 };
 
 pub fn cli() -> Command {
-  Command::new("dump").about("Pretty-print the raw JSON data to stdout")
+  Command::new("dump")
+    .about("Display raw JSON data")
+    .long_about("Prints the complete tracker data in JSON format to the terminal. Useful for inspection, debugging, or manual backup. The output is formatted with proper indentation for readability.")
 }
 
 pub fn exec(gctx: &mut GlobalContext, _args: &ArgMatches) -> CliResult {

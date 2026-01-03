@@ -11,10 +11,12 @@ use crate::{
 
 pub fn cli() -> Command {
   Command::new("delete")
-    .about("Modify an existing record")
+    .about("Delete transaction records")
+    .long_about("Removes one or more records from your tracker. You can delete by record ID(s), by category (all income or all expenses), or by subcategory (all records in a specific subcategory).")
     .arg(
       Arg::new("ids")
-        .help("Comma separated list of record ids")
+        .help("Delete specific records by their IDs")
+        .long_help("Delete one or more specific records by their ID numbers. Use comma-separated list for multiple IDs. Example: -i 1,5,10")
         .short('i')
         .long("ids")
         .value_parser(clap::value_parser!(usize))
@@ -23,14 +25,16 @@ pub fn cli() -> Command {
     )
     .arg(
       Arg::new("by-cat")
-        .help("Specify a category. Deletes record for the category")
+        .help("Delete all records in a category")
+        .long_help("Deletes all records in the specified category (either 'income' or 'expenses'). Use with caution as this will remove all transactions of that type. Case-insensitive.")
         .short('c')
         .long("by-cat")
         .value_parser(parse_category),
     )
     .arg(
       Arg::new("by-subcat")
-        .help("Specify a subcategory. Deletes record for the subcategory")
+        .help("Delete all records in a subcategory")
+        .long_help("Deletes all records that belong to the specified subcategory. The subcategory name is case-insensitive. Use 'fintrack subcategory list' to see available subcategories.")
         .short('s')
         .long("by-subcat")
         .value_parser(clap::value_parser!(String)),

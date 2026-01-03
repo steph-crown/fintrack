@@ -22,6 +22,8 @@ fn run() -> Result<(), String> {
 
   let matches = Command::new("fintrack")
     .bin_name("fintrack")
+    .about("A local-first CLI financial tracker for managing income and expenses")
+    .version("1.0.0")
     .subcommand_required(true)
     .subcommands(commands::cli())
     .get_matches();

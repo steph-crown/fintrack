@@ -4,7 +4,8 @@ use crate::{CliResult, GlobalContext, commands::Exec, invalid_subcommand_error};
 
 pub fn cli() -> Command {
   Command::new("subcategory")
-    .about("Manage subcategories: list, add, delete, or rename")
+    .about("Manage your subcategories")
+    .long_about("Subcategories help you organize transactions into more specific groups (e.g., 'Groceries', 'Salary', 'Rent'). You can create custom subcategories, view them, rename them, or delete them (if they have no records). The default 'Miscellaneous' subcategory cannot be deleted.")
     .subcommand_required(true)
     .subcommands(build_cli())
 }

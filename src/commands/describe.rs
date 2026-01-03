@@ -7,7 +7,9 @@ use crate::{
 };
 
 pub fn cli() -> Command {
-  Command::new("describe").about("Show exploratory data analysis of your spending")
+  Command::new("describe")
+    .about("Show financial insights and statistics")
+    .long_about("Provides an overview of your financial data including total records, date range, spending breakdown by category and subcategory, and average transaction amount. Includes visual charts for quick understanding of your spending patterns.")
 }
 
 pub fn exec(gctx: &mut GlobalContext, _args: &ArgMatches) -> CliResult {
@@ -37,7 +39,8 @@ pub fn exec(gctx: &mut GlobalContext, _args: &ArgMatches) -> CliResult {
   };
 
   // Calculate by category
-  let mut category_stats: std::collections::HashMap<usize, (usize, f64)> = std::collections::HashMap::new();
+  let mut category_stats: std::collections::HashMap<usize, (usize, f64)> =
+    std::collections::HashMap::new();
   for record in &tracker_data.records {
     let entry = category_stats.entry(record.category).or_insert((0, 0.0));
     entry.0 += 1;
@@ -55,9 +58,13 @@ pub fn exec(gctx: &mut GlobalContext, _args: &ArgMatches) -> CliResult {
   by_category.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal));
 
   // Calculate by subcategory
-  let mut subcategory_stats: std::collections::HashMap<usize, (usize, f64)> = std::collections::HashMap::new();
+  let mut subcategory_stats: std::collections::HashMap<usize, (usize, f64)> =
+    std::collections::HashMap::new();
+
   for record in &tracker_data.records {
-    let entry = subcategory_stats.entry(record.subcategory).or_insert((0, 0.0));
+    let entry = subcategory_stats
+      .entry(record.subcategory)
+      .or_insert((0, 0.0));
     entry.0 += 1;
     entry.1 += record.amount;
   }
@@ -84,12 +91,14 @@ pub fn exec(gctx: &mut GlobalContext, _args: &ArgMatches) -> CliResult {
     .parse::<Currency>()
     .map_err(|e| CliError::Other(format!("Invalid currency in tracker data: {}", e)))?;
 
-  Ok(CliResponse::new(crate::ResponseContent::Describe(DescribeData {
-    total_records,
-    date_range,
-    by_category,
-    by_subcategory,
-    average_transaction,
-    currency,
-  })))
+  Ok(CliResponse::new(crate::ResponseContent::Describe(
+    DescribeData {
+      total_records,
+      date_range,
+      by_category,
+      by_subcategory,
+      average_transaction,
+      currency,
+    },
+  )))
 }

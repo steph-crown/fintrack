@@ -5,7 +5,9 @@ use clap::{ArgMatches, Command};
 use crate::{utils::file::FilePath, CliResponse, CliResult, GlobalContext, ResponseContent};
 
 pub fn cli() -> Command {
-  Command::new("clear").about("Delete all data and reset tracker to uninitialized state")
+  Command::new("clear")
+    .about("Delete all data and reset tracker")
+    .long_about("Permanently deletes all your financial data including all records, subcategories, and the tracker file itself. This action cannot be undone. You will be prompted to confirm before deletion. After clearing, you can run 'fintrack init' to start fresh.")
 }
 
 pub fn exec(gctx: &mut GlobalContext, _args: &ArgMatches) -> CliResult {

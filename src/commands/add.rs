@@ -11,36 +11,47 @@ use crate::{
 pub fn cli() -> Command {
   Command::new("add")
     .about("Record a new income or expense transaction")
+    .long_about("Adds a new financial record to your tracker. Category and amount are required. The amount must be greater than 0.")
     .arg(
       Arg::new("category")
         .index(1)
         .required(true)
-        .value_parser(parse_category),
+        .value_parser(parse_category)
+        .help("Transaction category: 'income' or 'expenses' (case-insensitive)")
+        .long_help("The type of transaction. Use 'income' for money received or 'expenses' for money spent. Case-insensitive (Income, INCOME, income all work)."),
     )
     .arg(
       Arg::new("amount")
         .index(2)
         .required(true)
-        .value_parser(clap::value_parser!(f64)),
+        .value_parser(clap::value_parser!(f64))
+        .help("Transaction amount (must be greater than 0)")
+        .long_help("The amount of money for this transaction. Must be a positive number greater than 0. Examples: 100, 150.50, 2000.75"),
     )
     .arg(
       Arg::new("subcategory")
         .short('s')
         .long("subcategory")
         .value_parser(clap::value_parser!(String))
-        .default_value("miscellaneous"),
+        .default_value("miscellaneous")
+        .help("Subcategory name for this transaction")
+        .long_help("A more specific category for this transaction (e.g., 'Groceries', 'Salary', 'Rent'). Must already exist - use 'fintrack subcategory list' to see available subcategories. Defaults to 'miscellaneous' if not specified."),
     )
     .arg(
       Arg::new("description")
         .short('d')
         .long("description")
-        .value_parser(clap::value_parser!(String)),
+        .value_parser(clap::value_parser!(String))
+        .help("Optional description or notes for this transaction")
+        .long_help("Any additional notes or description you want to add to this transaction. This is optional and can be left empty."),
     )
     .arg(
       Arg::new("date")
         .short('D')
         .long("date")
-        .value_parser(parse_date),
+        .value_parser(parse_date)
+        .help("Transaction date in DD-MM-YYYY format")
+        .long_help("The date when this transaction occurred. Format: DD-MM-YYYY (e.g., 30-12-2025). Defaults to today's date if not specified."),
     )
 }
 
