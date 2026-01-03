@@ -7,7 +7,7 @@ description = "A local-first CLI financial tracker for managing income and expen
 license = "MIT"
 repository = "https://github.com/steph-crown/fintrack"
 keywords = ["finance", "tracker", "cli", "expenses", "income"]
-categories = ["command-line-utilities", "financial"]
+categories = ["command-line-utilities"]
 homepage = "https://github.com/steph-crown/fintrack/readme.md"
 
 [dependencies]
