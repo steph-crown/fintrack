@@ -2,7 +2,7 @@ use std::io::{self, Write};
 
 use clap::{ArgMatches, Command};
 
-use crate::{CliResponse, CliResult, GlobalContext, ResponseContent, utils::file::FilePath};
+use crate::{utils::file::FilePath, CliResponse, CliResult, GlobalContext, ResponseContent};
 
 pub fn cli() -> Command {
   Command::new("clear").about("Delete all data and reset tracker to uninitialized state")

@@ -1,7 +1,13 @@
 [package]
 name = "fintrack"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2024"
+authors = ["Stephen Emmanuel <emmanuelstephen024@gmail.com>"]
+description = "A local-first CLI financial tracker for managing income and expenses"
+license = "MIT"
+repository = "https://github.com/steph-crown/fintrack"
+keywords = ["finance", "tracker", "cli", "budget", "expenses", "income"]
+categories = ["command-line-utilities", "financial"]
 
 [dependencies]
 chrono = "0.4.42"
