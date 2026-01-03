@@ -28,7 +28,7 @@ FinTrack follows a modular, layered architecture:
 └────────────────────┬────────────────────────────────┘
                      │
 ┌────────────────────▼────────────────────────────────┐
-│              Process Layer (modules/)               │
+│              Process Layer (commands/)              │
 │  init, add, delete, update, list, category,         │
 │  subcategory, clear, total, describe, dump, export  │
 └────────────────────┬────────────────────────────────┘
@@ -56,7 +56,7 @@ fintrack/
 │   ├── error.rs                # Error types and handling
 │   ├── models.rs               # Data structures (TrackerData, Record, etc.)
 │   ├── utils/file.rs            # File I/O utilities
-│   ├── modules/
+│   ├── commands/
 │   │   ├── init.rs             # Initialize tracker
 │   │   ├── add.rs              # Add record
 │   │   ├── delete.rs           # Delete records (by ID, category, subcategory)
