@@ -88,21 +88,18 @@ fintrack/
   "currency": "NGN",
   "created_at": "2025-12-30T10:30:00Z",
   "last_modified": "2025-12-30T14:45:30Z",
+  "opening_balance": 0.0,
   "categories": {
-    "Income": 1,
-    "Expenses": 2
+    "income": 1,
+    "expenses": 2
   },
   "subcategories_by_id": {
-    "1": "Miscellaneous",
-    "2": "Groceries",
-    "3": "Wages"
+    "1": "miscellaneous"
   },
   "subcategories_by_name": {
-    "Miscellaneous": 1,
-    "Groceries": 2,
-    "Wages": 3
+    "miscellaneous": 1
   },
-  "next_subcategory_id": 4,
+  "next_subcategory_id": 2,
   "records": [
     {
       "id": 1,
@@ -110,7 +107,7 @@ fintrack/
       "subcategory": 1,
       "description": "Monthly salary",
       "amount": 4000.0,
-      "date": "2025-12-30"
+      "date": "30-12-2025"
     }
   ],
   "next_record_id": 2
@@ -130,22 +127,23 @@ struct TrackerData {
     currency: String,
     created_at: String,        // ISO 8601
     last_modified: String,     // ISO 8601
-    categories: HashMap<String, u32>,
-    subcategories_by_id: HashMap<u32, String>,
-    subcategories_by_name: HashMap<String, u32>,
+    opening_balance: f64,
+    categories: HashMap<String, usize>,
+    subcategories_by_id: HashMap<usize, String>,
+    subcategories_by_name: HashMap<String, usize>,
     next_subcategory_id: u32,
     records: Vec<Record>,
-    next_record_id: u64,
+    next_record_id: usize,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 struct Record {
-    id: u64,
-    category: u32,             // ID from categories map
-    subcategory: u32,          // ID from subcategories map
+    id: usize,
+    category: usize,          // ID from categories map
+    subcategory: usize,       // ID from subcategories map
     description: String,
     amount: f64,               // Always positive; sign determined by category
-    date: String,              // Format: DD-MM-YYYY
+    date: String,             // Format: DD-MM-YYYY
 }
 
 #[derive(Debug)]
@@ -240,7 +238,7 @@ enum ValidationErrorKind {
 ### 4.1 Initialization
 
 ```bash
-fintrack init [--currency <CURRENCY>]
+fintrack init [-c|--currency <CURRENCY>] [-o|--opening <AMOUNT>]
 ```
 
 **Behavior:**
@@ -248,205 +246,170 @@ fintrack init [--currency <CURRENCY>]
 - Creates `~/.fintrack/` directory if it doesn't exist
 - Creates `~/.fintrack/backups/` directory
 - Initializes `~/.fintrack/tracker.json` with default structure
-- Sets currency (defaults to NGN if not specified)
+- Sets currency (defaults to NGN if not specified via `-c, --currency`)
+- Sets opening balance (defaults to 0.0 if not specified via `-o, --opening`)
 - Creates default categories (Income, Expenses) with IDs 1 and 2
 - Creates default subcategory "Miscellaneous" with ID 1
 - Sets `created_at` and `last_modified` timestamps
 - If tracker already exists, displays error: `"Tracker already initialized. Use 'fintrack clear' to start over."`
-- On success, displays: `"✓ Tracker initialized with currency: NGN"`
+- On success, displays: `"✓ Success"`
 
 ---
 
 ### 4.2 Adding Records
 
 ```bash
-fintrack add \
-  --category <CATEGORY> \
-  --amount <AMOUNT> \
-  [--subcategory <SUBCATEGORY>] \
-  [--description <DESCRIPTION>] \
-  [--date <DATE>]
+fintrack add <CATEGORY> <AMOUNT> \
+  [-s|--subcategory <SUBCATEGORY>] \
+  [-d|--description <DESCRIPTION>] \
+  [-D|--date <DATE>]
 ```
 
-**Short flags available:**
+**Examples:**
 
 ```bash
-fintrack add -c Income -a 4000
-fintrack add -c Expenses -a 150.50 -s Groceries -d "Weekly shop" --date 28-12-2025
+fintrack add Income 4000 -s Wages
+fintrack add Expenses 150.50 -s Groceries -d "Weekly shop" -D 28-12-2025
 ```
 
-| Long Flag       | Short  | Required | Default       |
-| --------------- | ------ | -------- | ------------- |
-| `--category`    | `-c`   | Yes      | —             |
-| `--amount`      | `-a`   | Yes      | —             |
-| `--subcategory` | `-s`   | No       | Miscellaneous |
-| `--description` | `-d`   | No       | (empty)       |
-| `--date`        | (none) | No       | Today         |
+| Argument/Flag       | Position | Required | Default       |
+| ------------------- | -------- | -------- | ------------- |
+| `category`          | 1        | Yes      | —             |
+| `amount`            | 2        | Yes      | —             |
+| `-s, --subcategory` | Flag     | No       | miscellaneous |
+| `-d, --description` | Flag     | No       | (empty)       |
+| `-D, --date`        | Flag     | No       | Today         |
 
 **Behavior:**
 
-- Flags can appear in any order
-- `--category` and `--amount` are required
-- `--subcategory` defaults to "Miscellaneous" if omitted
-- `--date` defaults to today (current date in DD-MM-YYYY format) if omitted
-- `--description` is optional; empty string allowed
+- `category` and `amount` are positional arguments (required)
+- `-s, --subcategory` defaults to "miscellaneous" if omitted
+- `-D, --date` defaults to today (current date in DD-MM-YYYY format) if omitted
+- `-d, --description` is optional; empty string allowed
 - Validates category exists, amount > 0, date is valid, subcategory exists
 - Auto-generates record ID (incremental)
 - Updates `last_modified` timestamp
 - Creates backup before mutation
-- On success, displays the full created record with generated ID and formatted date
-- Example output:
-  ```
-  ✓ Record added:
-    ID: 1 | Income | Wages | 4000.00 NGN | 30-12-2025 | Monthly salary
-  ```
+- On success, displays: `"✓ Success"` (record details shown via `ResponseContent::Record`)
 
 ---
 
 ### 4.3 Deleting Records
 
-#### Delete by ID(s):
+```bash
+fintrack delete (-i|--ids <ID1>,<ID2>,...) | (-c|--by-cat <CATEGORY>) | (-s|--by-subcat <SUBCATEGORY>)
+```
+
+**Examples:**
 
 ```bash
-fintrack delete <ID1>,<ID2>,<ID3>
-fintrack delete 1,5,10
+fintrack delete -i 1,5,10
+fintrack delete -c Expenses
+fintrack delete -s Groceries
 ```
+
+| Flag              | Required | Description                        |
+| ----------------- | -------- | ---------------------------------- |
+| `-i, --ids`       | One of   | Comma-separated list of record IDs |
+| `-c, --by-cat`    | One of   | Delete all records in category     |
+| `-s, --by-subcat` | One of   | Delete all records in subcategory  |
 
 **Behavior:**
 
-- Accepts comma-separated list of record IDs
-- Validates all IDs exist before deletion
-- If any ID doesn't exist, displays error and cancels entire operation (atomic)
+- Exactly one of the three flags must be provided (enforced by ArgGroup)
+- For `-i, --ids`: Accepts comma-separated list of record IDs, deletes matching records
+- For `-c, --by-cat`: Deletes all records with the specified category
+- For `-s, --by-subcat`: Deletes all records with the specified subcategory
 - Updates `last_modified` timestamp
 - Creates backup before mutation
-- On success, displays deleted records in strikethrough or red formatting
-- Example output:
-  ```
-  ✓ Deleted 2 records:
-    ~~ID: 1 | Income | Wages | 4000.00 NGN | 30-12-2025~~
-    ~~ID: 5 | Expenses | Groceries | 150.00 NGN | 28-12-2025~~
-  ```
-
-#### Delete by Category:
-
-```bash
-fintrack delete --by-cat Income
-fintrack delete -C Income
-```
-
-**Short flag:** `-C, --by-cat`
-
-**Behavior:**
-
-- Deletes all records with the specified category
-- Displays confirmation prompt: `"Delete all X records in category '<CATEGORY>'? This cannot be undone. (yes/no)"`
-- If user confirms, performs deletion and displays all deleted records
-- If user cancels, displays: `"Deletion cancelled."`
-- Updates `last_modified` timestamp, creates backup before mutation
-
-#### Delete by Subcategory:
-
-```bash
-fintrack delete --by-subcat Groceries
-fintrack delete -S Groceries
-```
-
-**Short flag:** `-S, --by-subcat`
-
-**Behavior:**
-
-- Same as `--by-cat` but for subcategories
-- Confirmation prompt and deletion logic identical
+- On success, displays: `"✓ Success"`
 
 ---
 
 ### 4.4 Updating Records
 
 ```bash
-fintrack update <ID> \
-  [--category <CATEGORY>] \
-  [--amount <AMOUNT>] \
-  [--subcategory <SUBCATEGORY>] \
-  [--description <DESCRIPTION>] \
-  [--date <DATE>]
+fintrack update <RECORD_ID> \
+  [-c|--category <CATEGORY>] \
+  [-a|--amount <AMOUNT>] \
+  [-s|--subcategory <SUBCATEGORY>] \
+  [-d|--description <DESCRIPTION>] \
+  [-D|--date <DATE>]
 ```
 
-**Short flags available:**
+**Examples:**
 
 ```bash
 fintrack update 5 -c Income -a 5000
 fintrack update 5 -s Wages -d "Updated description"
 ```
 
-| Long Flag       | Short  | Optional |
-| --------------- | ------ | -------- |
-| `--category`    | `-c`   | Yes      |
-| `--amount`      | `-a`   | Yes      |
-| `--subcategory` | `-s`   | Yes      |
-| `--description` | `-d`   | Yes      |
-| `--date`        | (none) | Yes      |
+| Argument/Flag       | Position | Optional |
+| ------------------- | -------- | -------- |
+| `record_id`         | 1        | No       |
+| `-c, --category`    | Flag     | Yes      |
+| `-a, --amount`      | Flag     | Yes      |
+| `-s, --subcategory` | Flag     | Yes      |
+| `-d, --description` | Flag     | Yes      |
+| `-D, --date`        | Flag     | Yes      |
 
 **Behavior:**
 
-- At least one flag (beyond ID) must be provided
+- `record_id` is a required positional argument
+- At least one optional flag should be provided (not enforced, but recommended)
 - Validates record ID exists
 - Validates each provided field against rules
 - Updates only specified fields; others remain unchanged
 - Updates `last_modified` timestamp
 - Creates backup before mutation
-- On success, displays the full updated record
-- Example output:
-  ```
-  ✓ Record updated:
-    ID: 1 | Income | Wages | 5000.00 NGN | 30-12-2025 | Monthly salary (increased)
-  ```
+- On success, displays: `"✓ Success"`
 
 ---
 
 ### 4.5 Listing Records
 
-#### List all:
+```bash
+fintrack list \
+  [-f|--first <N>] | [-l|--last <N>] \
+  [-S|--start <DATE>] \
+  [-E|--end <DATE>] \
+  [-c|--category <CATEGORY>] \
+  [-s|--subcategory <SUBCATEGORY>]
+```
+
+**Examples:**
 
 ```bash
 fintrack list
-```
-
-#### List with limits:
-
-```bash
 fintrack list -f 5      # First 5 records
 fintrack list -l 10     # Last 10 records
-```
-
-**Short flags available:**
-
-```bash
 fintrack list -c Income
 fintrack list -s Groceries
-fintrack list --start 01-12-2025 --end 31-12-2025
+fintrack list -S 01-12-2025 -E 31-12-2025
 ```
 
-| Long Flag       | Short  | Optional |
-| --------------- | ------ | -------- |
-| `--first`       | `-f`   | Yes      |
-| `--last`        | `-l`   | Yes      |
-| `--category`    | `-c`   | Yes      |
-| `--subcategory` | `-s`   | Yes      |
-| `--start`       | (none) | Yes      |
-| `--end`         | (none) | Yes      |
+| Flag            | Short | Optional | Description                      |
+| --------------- | ----- | -------- | -------------------------------- |
+| `--first`       | `-f`  | Yes      | Display first N records (oldest) |
+| `--last`        | `-l`  | Yes      | Display last N records (newest)  |
+| `--start`       | `-S`  | Yes      | Start date filter (DD-MM-YYYY)   |
+| `--end`         | `-E`  | Yes      | End date filter (DD-MM-YYYY)     |
+| `--category`    | `-c`  | Yes      | Filter by category               |
+| `--subcategory` | `-s`  | Yes      | Filter by subcategory            |
 
 **Behavior:**
 
-- `--first N`: Display the first N records (oldest N)
-- `--last N`: Display the last N records (most recent N)
-- `-c <CATEGORY>`: Displays all records in the specified category
-- `-s <SUBCATEGORY>`: Displays all records in the specified subcategory
-- `--start` and `--end`: Both optional, defaults to -Infinity and today respectively
+- `-f, --first N`: Display the first N records (oldest N)
+- `-l, --last N`: Display the last N records (most recent N)
+- `-f` and `-l` are mutually exclusive (enforced by ArgGroup)
+- `-c, --category`: Displays all records in the specified category
+- `-s, --subcategory`: Displays all records in the specified subcategory
+- `-S, --start` and `-E, --end`: Date range filter (both optional)
 - Date format: DD-MM-YYYY
 - Inclusive on both ends
-- Sorted by date
-- All variants sorted by date (oldest first)
-- Table format with columns: ID, Category, Subcategory, Amount, Currency, Date, Description
+- Sorted by date (oldest first)
+- Table format with columns: ID, Category, Subcategory, Amount, Date, Description
+- Currency is included in the Amount column
 - If no records exist: `"No records found."`
 
 ---
@@ -481,13 +444,13 @@ fintrack subcategory list
 
 **Behavior:**
 
-- Displays all subcategories with IDs and creation dates
+- Displays all subcategories with IDs
 - Output:
   ```
   Subcategories:
-    1 - Miscellaneous (created: 2025-12-30T10:30:00Z)
-    2 - Groceries (created: 2025-12-30T10:35:15Z)
-    3 - Wages (created: 2025-12-30T10:40:22Z)
+    1 - Miscellaneous
+    2 - Groceries
+    3 - Wages
   ```
 
 #### Add subcategory:
@@ -501,6 +464,7 @@ fintrack subcategory add <NAME>
 - `<NAME>` must be alphanumeric, start with a letter, and be unique
 - Case-insensitive; stored in Title Case (first letter uppercase, rest lowercase)
 - Validates name doesn't already exist
+- Cannot create "Miscellaneous" (system subcategory)
 - Auto-generates subcategory ID
 - Updates `last_modified` timestamp
 - Creates backup before mutation
@@ -516,23 +480,20 @@ fintrack subcategory delete <NAME>
 
 - Validates subcategory exists
 - Checks if any records reference this subcategory
-- If records exist, displays error: `"Cannot delete 'Groceries'—it has 5 records. Delete those first using 'fintrack delete --by-subcat Groceries', or manually delete individual records."`
-- If no records, prompts for confirmation: `"Delete subcategory 'Groceries'? (yes/no)"`
-- On confirmation, deletes and displays: `"✓ Subcategory 'Groceries' deleted."`
+- If records exist, displays error: `"Cannot delete 'Groceries'—it has 5 records. Delete those records first using 'fintrack delete -s Groceries', or manually delete individual records."`
 - Cannot delete "Miscellaneous" (system subcategory)
+- If no records, deletes and displays: `"✓ Subcategory 'Groceries' deleted."`
 - Updates `last_modified` timestamp, creates backup before mutation
 
 #### Rename subcategory:
 
 ```bash
-fintrack subcategory update --old Groceries --new Food
-fintrack subcategory update -o Groceries -n "Food & Groceries"
+fintrack subcategory rename <OLD> <NEW>
 ```
-
-**Short flags:** `-o, --old` | `-n, --new`
 
 **Behavior:**
 
+- Both `<OLD>` and `<NEW>` are positional arguments
 - Validates old subcategory exists
 - Validates new name doesn't already exist
 - Updates the name in `subcategories_by_id` and `subcategories_by_name`
@@ -595,7 +556,7 @@ fintrack dump
 
 ---
 
-### 4.11 Describe (Post-MVP)
+### 4.11 Describe
 
 ```bash
 fintrack describe
@@ -606,10 +567,9 @@ fintrack describe
 - Provides basic exploratory data analysis (EDA)
 - Shows:
   - Total records
-  - Record count by category
-  - Record count by subcategory
-  - Total by category
   - Date range (earliest and latest record)
+  - Record count and totals by category
+  - Top 5 subcategories by total amount
   - Average transaction amount
 - Format:
 
@@ -630,26 +590,31 @@ fintrack describe
     Average Transaction: 3,812.30 NGN
   ```
 
-**Note:** Deferred to post-MVP to focus on core functionality.
-
 ---
 
-### 4.12 Export (Post-MVP)
+### 4.12 Export
 
 ```bash
-fintrack export --path <FOLDER_PATH> --type <FILE_TYPE>
+fintrack export <PATH> [-t|--type <FILE_TYPE>]
+```
+
+**Examples:**
+
+```bash
+fintrack export ~/Downloads -t csv
+fintrack export ~/Downloads -t json
 ```
 
 **Behavior:**
 
-- Exports tracker data to a file in `<FOLDER_PATH>`
-- Supported types: `csv` (initially), `json` (future)
-- For CSV: columns are ID, Category, Subcategory, Description, Amount, Currency, Date
-- Filename format: `fintrack_export_2025-12-30T14-45-30Z.csv`
-- On success: `"✓ Data exported to: /path/to/fintrack_export_2025-12-30T14-45-30Z.csv"`
+- `<PATH>` is a required positional argument (directory path)
+- `-t, --type` defaults to `json` if not specified
+- Supported types: `csv`, `json`
+- Exports tracker data to a file in the specified directory
+- For CSV: columns are ID, Category, Subcategory, Amount, Currency, Date, Description
+- Filename format: `fintrack_export_YYYY-MM-DDTHH-MM-SSZ.{csv|json}`
 - Validates folder exists and is writable
-
-**Note:** Deferred to post-MVP.
+- On success: `"✓ Data exported to: /path/to/fintrack_export_2025-12-30T14-45-30Z.csv"`
 
 ---
 
@@ -1089,8 +1054,8 @@ Suggestion: Verify your recent changes. Manual inspection available with 'fintra
 **Why:** Enables O(1) lookups in both directions (name → ID and ID → name).
 
 ```rust
-subcategories_by_id: HashMap<u32, String>,
-subcategories_by_name: HashMap<String, u32>,
+subcategories_by_id: HashMap<usize, String>,
+subcategories_by_name: HashMap<String, usize>,
 ```
 
 **Trade-off:** Slight memory overhead and must keep in sync. Worth it for fast operations.

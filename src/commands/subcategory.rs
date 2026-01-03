@@ -29,7 +29,8 @@ fn build_exec(cmd: &str) -> Option<Exec> {
     "add" => Some(add::exec),
     "delete" => Some(delete::exec),
     "list" => Some(list::exec),
-    "update" => Some(rename::exec),
+    "rename" => Some(rename::exec),
+    "update" => Some(rename::exec), // Alias for rename
     _ => None,
   }
 }

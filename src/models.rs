@@ -43,12 +43,24 @@ impl Total {
   }
 }
 
+pub struct DescribeData {
+  pub total_records: usize,
+  pub date_range: Option<(String, String)>,
+  pub by_category: Vec<(String, usize, f64)>, // (name, count, total)
+  pub by_subcategory: Vec<(String, usize, f64)>, // (name, count, total)
+  pub average_transaction: f64,
+  pub currency: Currency,
+}
+
 pub enum ResponseContent {
-  Message(String),   // For: "Data cleared!" or "Transaction added!"
-  Record { record: Record, tracker_data: TrackerData },    // For: Showing the one you just created
-  List { records: Vec<Record>, tracker_data: TrackerData }, // For: The 'list' or 'history' command
+  Message(String),
+  Record { record: Record, tracker_data: TrackerData },
+  List { records: Vec<Record>, tracker_data: TrackerData },
   TrackerData(TrackerData),
   Total(Total),
+  Categories(Vec<(usize, String)>),
+  Subcategories(Vec<(usize, String)>),
+  Describe(DescribeData),
 }
 
 pub type CliResult = Result<CliResponse, CliError>;
@@ -107,7 +119,7 @@ pub struct TrackerData {
   pub categories: HashMap<String, usize>,
   pub subcategories_by_id: HashMap<usize, String>,
   pub subcategories_by_name: HashMap<String, usize>,
-  next_subcategory_id: u32,
+  pub next_subcategory_id: u32,
   pub records: Vec<Record>,
   pub next_record_id: usize,
 }

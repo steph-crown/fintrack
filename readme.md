@@ -1,6 +1,4 @@
-# FinTrack [in progress]
-
-> _described below is what i plan for this tool to be able to do. i'll update with what's done as i progress_
+# FinTrack
 
 A local-first CLI financial tracker written in Rust. Track your income and expenses on your own machine, with zero cloud dependencies and complete data ownership.
 
@@ -13,9 +11,7 @@ A local-first CLI financial tracker written in Rust. Track your income and expen
 
 ## Installation
 
-### From Source (Recommended)
-
-> _eventually, i want this to be a distributed binary that won't require you to install Rust_
+### From Source
 
 Requires Rust 1.70+. [Install Rust here](https://www.rust-lang.org/tools/install).
 
@@ -36,36 +32,45 @@ fintrack --version
 ### 1. Initialize Your Tracker
 
 ```bash
-fintrack init --currency NGN
+fintrack init -c NGN
 ```
 
-This creates `~/.fintrack/tracker.json` and sets your currency. Supported currencies: NGN, USD, GBP, EUR, CAD, AUD, JPY, INR.
+Or with opening balance:
+
+```bash
+fintrack init -c NGN -o 1000.00
+```
+
+This creates `~/.fintrack/tracker.json` and sets your currency. Supported currencies: NGN, USD, GBP, EUR, CAD, AUD, JPY.
+
+**Flags:**
+- `-c, --currency` (optional) – Currency code, defaults to NGN
+- `-o, --opening` (optional) – Opening balance, defaults to 0.0
 
 ### 2. Add Your First Record
 
 ```bash
-fintrack add -c Income -a 4000 -s Wages
+fintrack add Income 4000 -s Wages
 ```
 
 Or using long flags:
 
 ```bash
-fintrack add --category Income --amount 4000 --subcategory Wages
+fintrack add Income 4000 --subcategory Wages
 ```
 
-Optionally add a description and specific date:
+With description and date:
 
 ```bash
-fintrack add -c Expenses -a 150.50 -s Groceries -d "Weekly shop" --date 28-12-2025
+fintrack add Expenses 150.50 -s Groceries -d "Weekly shop" -D 28-12-2025
 ```
 
-**Available flags:**
-
-- `-c, --category` (required) – Income or Expenses
-- `-a, --amount` (required) – Positive number
-- `-s, --subcategory` (optional) – Defaults to Miscellaneous
+**Arguments:**
+- `category` (positional, required) – Income or Expenses
+- `amount` (positional, required) – Positive number
+- `-s, --subcategory` (optional) – Defaults to "miscellaneous"
 - `-d, --description` (optional) – Any text
-- `--date` (optional) – Format: DD-MM-YYYY, defaults to today
+- `-D, --date` (optional) – Format: DD-MM-YYYY, defaults to today
 
 ### 3. View Your Data
 
@@ -82,7 +87,7 @@ fintrack total
 Filter by date range:
 
 ```bash
-fintrack list --start 01-12-2025 --end 31-12-2025
+fintrack list -S 01-12-2025 -E 31-12-2025
 ```
 
 Filter by category or subcategory:
@@ -92,13 +97,32 @@ fintrack list -c Income
 fintrack list -s Groceries
 ```
 
-View last 10 records:
+View first or last N records:
 
 ```bash
-fintrack list -l 10
+fintrack list -f 5   # First 5 records
+fintrack list -l 10  # Last 10 records
 ```
 
-### 4. Manage Subcategories
+**List flags:**
+- `-f, --first N` – Show first N records
+- `-l, --last N` – Show last N records
+- `-S, --start DATE` – Start date filter (DD-MM-YYYY)
+- `-E, --end DATE` – End date filter (DD-MM-YYYY)
+- `-c, --category CATEGORY` – Filter by category
+- `-s, --subcategory NAME` – Filter by subcategory
+
+### 4. Manage Categories
+
+View all categories:
+
+```bash
+fintrack category list
+```
+
+**Note:** Categories (Income, Expenses) are immutable and cannot be created, deleted, or renamed.
+
+### 5. Manage Subcategories
 
 View all subcategories:
 
@@ -121,10 +145,16 @@ fintrack subcategory delete Utilities
 Rename a subcategory:
 
 ```bash
-fintrack subcategory update -o Groceries -n Food
+fintrack subcategory rename Groceries Food
 ```
 
-### 5. Update or Delete Records
+**Subcategory commands:**
+- `list` – View all subcategories
+- `add <NAME>` – Create a new subcategory
+- `delete <NAME>` – Delete a subcategory (must have no records)
+- `rename <OLD> <NEW>` – Rename a subcategory
+
+### 6. Update or Delete Records
 
 Update a record by ID:
 
@@ -132,47 +162,114 @@ Update a record by ID:
 fintrack update 5 -a 200 -d "Revised amount"
 ```
 
-Delete a record by ID:
+**Update arguments:**
+- `record_id` (positional, required) – Record ID to update
+- `-c, --category CATEGORY` (optional) – New category
+- `-a, --amount AMOUNT` (optional) – New amount
+- `-s, --subcategory NAME` (optional) – New subcategory
+- `-d, --description TEXT` (optional) – New description
+- `-D, --date DATE` (optional) – New date
+
+Delete records by ID(s):
 
 ```bash
-fintrack delete 5
+fintrack delete -i 5
+fintrack delete -i 1,2,3  # Multiple IDs
 ```
 
-Delete all records in a category or subcategory:
+Delete all records in a category:
 
 ```bash
-fintrack delete -C Expenses
-fintrack delete -S Groceries
+fintrack delete -c Expenses
 ```
 
-(Both require confirmation.)
+Delete all records in a subcategory:
+
+```bash
+fintrack delete -s Groceries
+```
+
+**Delete flags (one required):**
+- `-i, --ids ID1,ID2,...` – Delete by record IDs
+- `-c, --by-cat CATEGORY` – Delete all records in category
+- `-s, --by-subcat NAME` – Delete all records in subcategory
+
+### 7. Explore Your Data
+
+Get a summary with exploratory data analysis:
+
+```bash
+fintrack describe
+```
+
+This shows:
+- Total records
+- Date range
+- Records and totals by category
+- Top 5 subcategories by total
+- Average transaction amount
+
+### 8. Export Your Data
+
+Export to CSV:
+
+```bash
+fintrack export ~/Downloads -t csv
+```
+
+Export to JSON:
+
+```bash
+fintrack export ~/Downloads -t json
+```
+
+**Export arguments:**
+- `path` (positional, required) – Directory where file will be created
+- `-t, --type TYPE` (optional) – File type: csv or json (defaults to json)
+
+Files are named: `fintrack_export_YYYY-MM-DDTHH-MM-SSZ.{csv|json}`
+
+### 9. Other Commands
+
+View raw JSON data:
+
+```bash
+fintrack dump
+```
+
+Clear all data:
+
+```bash
+fintrack clear
+```
 
 ## Common Commands
 
 | Task                          | Command                                                            |
 | ----------------------------- | ------------------------------------------------------------------ |
-| Initialize tracker            | `fintrack init --currency NGN`                                     |
-| Add record (short)            | `fintrack add -c Income -a 4000 -s Wages`                          |
-| Add record (long)             | `fintrack add --category Income --amount 4000 --subcategory Wages` |
-| Update record (short)         | `fintrack update 5 -a 200 -d "Updated"`                            |
-| Update record (long)          | `fintrack update 5 --amount 200 --description "Updated"`           |
+| Initialize tracker            | `fintrack init -c NGN`                                             |
+| Initialize with opening       | `fintrack init -c NGN -o 1000`                                    |
+| Add record                    | `fintrack add Income 4000 -s Wages`                               |
+| Add with description          | `fintrack add Expenses 150.50 -s Groceries -d "Weekly shop"`      |
+| Update record                 | `fintrack update 5 -a 200 -d "Updated"`                           |
 | List all records              | `fintrack list`                                                    |
-| List last 10 (short)          | `fintrack list -l 10`                                              |
-| List last 10 (long)           | `fintrack list --last 10`                                          |
-| Filter by category (short)    | `fintrack list -c Income`                                          |
-| Filter by category (long)     | `fintrack list --category Income`                                  |
-| Filter by date                | `fintrack list --start 01-12-2025 --end 31-12-2025`                |
+| List first 5                  | `fintrack list -f 5`                                               |
+| List last 10                  | `fintrack list -l 10`                                              |
+| Filter by category            | `fintrack list -c Income`                                          |
+| Filter by date range          | `fintrack list -S 01-12-2025 -E 31-12-2025`                        |
 | View totals                   | `fintrack total`                                                   |
-| Delete record by ID           | `fintrack delete 5`                                                |
-| Delete by category (short)    | `fintrack delete -C Expenses`                                      |
-| Delete by category (long)     | `fintrack delete --by-cat Expenses`                                |
-| Delete by subcategory (short) | `fintrack delete -S Groceries`                                     |
+| Delete record by ID           | `fintrack delete -i 5`                                             |
+| Delete multiple IDs           | `fintrack delete -i 1,2,3`                                         |
+| Delete by category            | `fintrack delete -c Expenses`                                      |
+| Delete by subcategory         | `fintrack delete -s Groceries`                                     |
 | View categories               | `fintrack category list`                                           |
 | View subcategories            | `fintrack subcategory list`                                        |
 | Add subcategory               | `fintrack subcategory add Shopping`                                |
-| Rename subcategory (short)    | `fintrack subcategory update -o Old -n New`                        |
-| Rename subcategory (long)     | `fintrack subcategory update --old Old --new New`                  |
-| Export data (future)          | `fintrack export --path ~/Downloads --type csv`                    |
+| Rename subcategory            | `fintrack subcategory rename Old New`                              |
+| Delete subcategory            | `fintrack subcategory delete Shopping`                             |
+| Describe data                 | `fintrack describe`                                                |
+| Export to CSV                 | `fintrack export ~/Downloads -t csv`                               |
+| Export to JSON                | `fintrack export ~/Downloads -t json`                              |
 | View raw JSON                 | `fintrack dump`                                                    |
 | Clear all data                | `fintrack clear`                                                   |
 | Get help                      | `fintrack help`                                                    |
@@ -192,7 +289,6 @@ All your data is stored locally:
 ```
 ~/.fintrack/
 ├── tracker.json           # Your financial data
-├── config                 # (Future) Configuration
 └── backups/
     └── tracker.backup.*.json  # Automatic backups for recovery
 ```
@@ -217,48 +313,61 @@ This pretty-prints your `tracker.json` to the terminal.
 
 ```bash
 # Add monthly salary
-fintrack add --category Income --amount 50000 --subcategory Wages --date 01-12-2025
+fintrack add Income 50000 -s Wages -D 01-12-2025
 
 # Add rent
-fintrack add --category Expenses --amount 20000 --subcategory Housing --date 01-12-2025
+fintrack add Expenses 20000 -s Housing -D 01-12-2025
 
 # Add groceries
-fintrack add --category Expenses --amount 5000 --subcategory Groceries --date 10-12-2025
-fintrack add --category Expenses --amount 4500 --subcategory Groceries --date 20-12-2025
+fintrack add Expenses 5000 -s Groceries -D 10-12-2025
+fintrack add Expenses 4500 -s Groceries -D 20-12-2025
 
 # View summary
 fintrack total
 
 # See expenses by category
-fintrack list --category Expenses
+fintrack list -c Expenses
 ```
 
 ### Review Last Week's Spending
 
 ```bash
-fintrack list --last 7
+fintrack list -l 7
 ```
 
 ### See Income for the Year
 
 ```bash
-fintrack list --category Income --start 01-01-2025 --end 31-12-2025
+fintrack list -c Income -S 01-01-2025 -E 31-12-2025
 ```
 
 ### Correct a Mistake
 
 ```bash
-fintrack list --last 5        # Find the wrong record
-fintrack update 42 --amount 300  # Correct it
+fintrack list -l 5        # Find the wrong record
+fintrack update 42 -a 300  # Correct it
 ```
+
+### Analyze Your Spending
+
+```bash
+fintrack describe
+```
+
+This provides insights like:
+- Total records and date range
+- Spending breakdown by category
+- Top subcategories
+- Average transaction amount
 
 ## Keyboard Shortcuts & Tips
 
 - Use `fintrack help` to see all available commands
-- Flag order doesn't matter: `--category Income --amount 4000` is the same as `--amount 4000 --category Income`
+- Flag order doesn't matter: `-c Income -a 4000` is the same as `-a 4000 -c Income`
 - Category and subcategory names are case-insensitive (use "wages", "Wages", or "WAGES"—all work)
 - Dates default to today if not specified
 - Descriptions are optional but helpful for future reference
+- Use `fintrack describe` to get insights into your spending patterns
 
 ## Troubleshooting
 
@@ -287,7 +396,7 @@ Then use the exact name from the list.
 You must delete all records in that subcategory first, or delete the subcategory and all its records at once:
 
 ```bash
-fintrack delete --by-subcat Groceries
+fintrack delete -s Groceries
 ```
 
 ### Data seems corrupted or missing
@@ -304,8 +413,7 @@ to inspect your data. If something is still wrong, contact support or check GitH
 
 Coming soon:
 
-- **Describe command:** Exploratory data analysis (EDA) of your spending
-- **CSV Export:** Export your data to CSV for use in Excel or other tools
+- **PDF Export:** Export your data to PDF format
 - **Shell Autocompletion:** Tab-complete commands and category names
 - **Configuration file:** Customize defaults and display preferences
 
@@ -321,8 +429,8 @@ MIT License. See LICENSE file for details.
 
 ## Want to Know More?
 
-Interested in the technical design and architecture decisions behind FinTrack? Check out the **[Design Document](./docs/design.md)** for a comprehensive deep-dive into how I plan to build tool, including data structures, error handling, backup strategies, and the reasoning behind each decision.
+Interested in the technical design and architecture decisions behind FinTrack? Check out the **[Design Document](./docs/design.md)** for a comprehensive deep-dive into how the tool is built, including data structures, error handling, backup strategies, and the reasoning behind each decision.
 
 ---
 
-**Get started now:** `fintrack init --currency NGN`
+**Get started now:** `fintrack init -c NGN`

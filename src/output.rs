@@ -271,9 +271,7 @@ pub fn write_response(res: &crate::CliResponse, writer: &mut impl io::Write) -> 
       tracker_data,
     } => {
       writeln!(writer, "{} Record created:", "✓".green().bold())?;
-      // Parse currency string to Currency enum for display
       let currency_enum = tracker_data.currency.parse::<Currency>().ok();
-      // Use TrackerData to resolve category/subcategory names from IDs
       write_record_single(&record, Some(tracker_data), currency_enum.as_ref(), writer)?;
     }
     ResponseContent::List {
@@ -283,9 +281,7 @@ pub fn write_response(res: &crate::CliResponse, writer: &mut impl io::Write) -> 
       if records.is_empty() {
         writeln!(writer, "{}", "No records found.".yellow())?;
       } else {
-        // Parse currency string to Currency enum for display
         let currency_enum = tracker_data.currency.parse::<Currency>().ok();
-        // Use TrackerData to resolve category/subcategory names from IDs
         write_records_table(&records, Some(tracker_data), currency_enum.as_ref(), writer)?;
       }
     }
@@ -295,13 +291,20 @@ pub fn write_response(res: &crate::CliResponse, writer: &mut impl io::Write) -> 
     ResponseContent::Total(totals) => {
       write_total_summary(totals, writer)?;
     }
+    ResponseContent::Categories(categories) => {
+      write_categories_list(categories, writer)?;
+    }
+    ResponseContent::Subcategories(subcategories) => {
+      write_subcategories_list(subcategories, writer)?;
+    }
+    ResponseContent::Describe(data) => {
+      write_describe(data, writer)?;
+    }
   }
 
   Ok(())
 }
 
-/// Write records table with TrackerData context for resolving names
-/// This is a helper function that commands can use when they have TrackerData available
 pub fn write_records_table_with_context(
   records: &[Record],
   tracker_data: &TrackerData,
@@ -311,8 +314,6 @@ pub fn write_records_table_with_context(
   write_records_table(records, Some(tracker_data), currency.as_ref(), writer)
 }
 
-/// Write a single record with TrackerData context for resolving names
-/// This is a helper function that commands can use when they have TrackerData available
 pub fn write_record_single_with_context(
   record: &Record,
   tracker_data: &TrackerData,
@@ -366,7 +367,6 @@ fn write_records_table(
   currency: Option<&Currency>,
   writer: &mut impl io::Write,
 ) -> io::Result<()> {
-  // Always show currency - use provided currency or fallback to empty string
   let currency_str = currency
     .map(|c| format!(" {}", c))
     .unwrap_or_else(|| "".to_string());
@@ -490,4 +490,138 @@ struct RecordRow {
   date: String,
   #[tabled(rename = "Description")]
   description: String,
+}
+
+/// Write categories list
+fn write_categories_list(categories: &[(usize, String)], writer: &mut impl io::Write) -> io::Result<()> {
+  writeln!(writer, "{}", "Categories:".bright_white().bold())?;
+  for (id, name) in categories {
+    writeln!(
+      writer,
+      "  {} - {}",
+      id.to_string().cyan(),
+      name.bright_white()
+    )?;
+  }
+  Ok(())
+}
+
+/// Write subcategories list
+fn write_subcategories_list(subcategories: &[(usize, String)], writer: &mut impl io::Write) -> io::Result<()> {
+  writeln!(writer, "{}", "Subcategories:".bright_white().bold())?;
+  for (id, name) in subcategories {
+    writeln!(
+      writer,
+      "  {} - {}",
+      id.to_string().cyan(),
+      name.bright_white()
+    )?;
+  }
+  Ok(())
+}
+
+/// Write describe/EDA output
+fn write_describe(data: &crate::DescribeData, writer: &mut impl io::Write) -> io::Result<()> {
+  writeln!(writer, "{}", "Financial Overview:".bright_white().bold())?;
+  writeln!(
+    writer,
+    "  {} {}",
+    "Total Records:".bright_white(),
+    data.total_records.to_string().bright_cyan()
+  )?;
+
+  if let Some((start, end)) = &data.date_range {
+    writeln!(
+      writer,
+      "  {} {} to {}",
+      "Date Range:".bright_white(),
+      start.bright_cyan(),
+      end.bright_cyan()
+    )?;
+  }
+
+  writeln!(writer)?;
+  writeln!(writer, "  {}", "By Category:".bright_white().bold())?;
+  for (name, count, total) in &data.by_category {
+    writeln!(
+      writer,
+      "    {}: {} records | {} {}",
+      name.bright_white(),
+      count.to_string().bright_cyan(),
+      format_amount(*total).bright_green(),
+      data.currency
+    )?;
+  }
+
+  if !data.by_category.is_empty() {
+    writeln!(writer)?;
+    writeln!(writer, "  {}", "Category Spending Chart:".bright_white().bold())?;
+    let max_total = data
+      .by_category
+      .iter()
+      .map(|(_, _, total)| *total)
+      .fold(0.0, f64::max);
+
+    if max_total > 0.0 {
+      for (name, _, total) in &data.by_category {
+        let bar_length = ((total / max_total) * 50.0) as usize;
+        let bar = "█".repeat(bar_length);
+        writeln!(
+          writer,
+          "    {} │{} {}",
+          name.bright_white(),
+          bar.bright_green(),
+          format_amount(*total).bright_green()
+        )?;
+      }
+    }
+  }
+
+  writeln!(writer)?;
+  writeln!(writer, "  {}", "By Subcategory (Top 5):".bright_white().bold())?;
+  for (name, count, total) in data.by_subcategory.iter().take(5) {
+    writeln!(
+      writer,
+      "    {}: {} records | {} {}",
+      name.bright_white(),
+      count.to_string().bright_cyan(),
+      format_amount(*total).bright_green(),
+      data.currency
+    )?;
+  }
+
+  if !data.by_subcategory.is_empty() {
+    writeln!(writer)?;
+    writeln!(writer, "  {}", "Top Subcategories Chart:".bright_white().bold())?;
+    let top_5: Vec<_> = data.by_subcategory.iter().take(5).collect();
+    let max_total = top_5
+      .iter()
+      .map(|(_, _, total)| *total)
+      .fold(0.0, f64::max);
+
+    if max_total > 0.0 {
+      for (name, _, total) in top_5 {
+        let bar_length = ((total / max_total) * 50.0) as usize;
+        let bar = "█".repeat(bar_length);
+        writeln!(
+          writer,
+          "    {} │{} {}",
+          name.bright_white(),
+          bar.bright_cyan(),
+          format_amount(*total).bright_cyan()
+        )?;
+      }
+    }
+  }
+
+  writeln!(writer)?;
+  writeln!(
+    writer,
+    "  {} {} {}",
+    "Average Transaction:".bright_white(),
+    format_amount(data.average_transaction).bright_cyan(),
+    data.currency
+  )?;
+
+  Ok(())
 }
