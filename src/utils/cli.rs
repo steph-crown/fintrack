@@ -9,6 +9,7 @@ pub trait ArgMatchesExt {
   fn value_of_currency_or_def(&self, id: &str) -> &Currency;
   fn value_of_category(&self, id: &str) -> Result<&Category, CliError>;
   fn value_of_date(&self, id: &str) -> Option<String>;
+  fn value_of_vec<T: Clone + Send + Sync + 'static>(&self, id: &str) -> Vec<T>;
 
   // Optional versions for update command
   fn value_of_category_opt(&self, id: &str) -> Option<&Category>;
@@ -50,6 +51,13 @@ impl<'a> ArgMatchesExt for ArgMatches {
     self
       .get_one::<chrono::NaiveDate>(id)
       .map(|d| d.format("%d-%m-%Y").to_string())
+  }
+
+  fn value_of_vec<T: Clone + Send + Sync + 'static>(&self, id: &str) -> Vec<T> {
+    self
+      .get_many::<T>(id)
+      .map(|iter| iter.cloned().collect())
+      .unwrap_or_default()
   }
 
   fn value_of_category_opt(&self, id: &str) -> Option<&Category> {
