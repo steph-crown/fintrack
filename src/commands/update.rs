@@ -3,7 +3,7 @@ use clap::{Arg, ArgMatches, Command};
 use crate::command_prelude::ArgMatchesExt;
 use crate::parsers::parse_date;
 use crate::utils::file::{FilePath, write_json_to_file};
-use crate::{Category, CliError, CliResponse, CliResult, GlobalContext, TrackerData};
+use crate::{Category, CliError, CliResponse, CliResult, GlobalContext, ResponseContent, TrackerData};
 
 pub fn cli() -> Command {
   Command::new("update")
@@ -81,6 +81,11 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   }
 
   if let Some(amount) = args.get_f64_opt("amount") {
+    if amount <= 0.0 {
+      return Err(CliError::ValidationError(
+        crate::ValidationErrorKind::AmountTooSmall { amount },
+      ));
+    }
     record.amount = amount;
   }
 
@@ -98,8 +103,13 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
 
   tracker_data.last_modified = chrono::Utc::now().to_rfc3339();
 
+  let updated_record = record.clone();
+
   let tracker_json = serde_json::json!(tracker_data);
   write_json_to_file(&tracker_json, &mut file)?;
 
-  Ok(CliResponse::success())
+  Ok(CliResponse::new(ResponseContent::Record {
+    record: updated_record,
+    tracker_data,
+  }))
 }

@@ -25,6 +25,9 @@ pub fn cli() -> Command {
 pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   let currency = args.get_currency_or_default("currency");
   let opening_balance = args.get_f64_or_default("opening");
+
+  std::fs::create_dir_all(gctx.backups_path())?;
+
   let mut file = gctx.tracker_path().create_file_if_not_exists()?;
 
   let default_json = default_tracker_json(currency, opening_balance);

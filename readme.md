@@ -6,7 +6,7 @@ A local-first CLI financial tracker written in Rust. Track your income and expen
 
 - **Your data stays yours.** Everything is stored locally in `~/.fintrack/`. No remote servers, no accounts, no privacy concerns.
 - **Simple and fast.** Lightweight CLI tool that gets out of your way.
-- **Reliable.** Automatic backups and corruption recovery ensure your data is never lost.
+- **Reliable.** Simple and robust data storage ensures your data is safe.
 - **Transparent.** Open-source and easy to inspect. All your financial data is in human-readable JSON.
 
 ## Installation
@@ -44,6 +44,7 @@ fintrack init -c NGN -o 1000.00
 This creates `~/.fintrack/tracker.json` and sets your currency. Supported currencies: NGN, USD, GBP, EUR, CAD, AUD, JPY.
 
 **Flags:**
+
 - `-c, --currency` (optional) – Currency code, defaults to NGN
 - `-o, --opening` (optional) – Opening balance, defaults to 0.0
 
@@ -66,6 +67,7 @@ fintrack add Expenses 150.50 -s Groceries -d "Weekly shop" -D 28-12-2025
 ```
 
 **Arguments:**
+
 - `category` (positional, required) – Income or Expenses
 - `amount` (positional, required) – Positive number
 - `-s, --subcategory` (optional) – Defaults to "miscellaneous"
@@ -105,6 +107,7 @@ fintrack list -l 10  # Last 10 records
 ```
 
 **List flags:**
+
 - `-f, --first N` – Show first N records
 - `-l, --last N` – Show last N records
 - `-S, --start DATE` – Start date filter (DD-MM-YYYY)
@@ -149,6 +152,7 @@ fintrack subcategory rename Groceries Food
 ```
 
 **Subcategory commands:**
+
 - `list` – View all subcategories
 - `add <NAME>` – Create a new subcategory
 - `delete <NAME>` – Delete a subcategory (must have no records)
@@ -163,6 +167,7 @@ fintrack update 5 -a 200 -d "Revised amount"
 ```
 
 **Update arguments:**
+
 - `record_id` (positional, required) – Record ID to update
 - `-c, --category CATEGORY` (optional) – New category
 - `-a, --amount AMOUNT` (optional) – New amount
@@ -190,6 +195,7 @@ fintrack delete -s Groceries
 ```
 
 **Delete flags (one required):**
+
 - `-i, --ids ID1,ID2,...` – Delete by record IDs
 - `-c, --by-cat CATEGORY` – Delete all records in category
 - `-s, --by-subcat NAME` – Delete all records in subcategory
@@ -203,6 +209,7 @@ fintrack describe
 ```
 
 This shows:
+
 - Total records
 - Date range
 - Records and totals by category
@@ -224,6 +231,7 @@ fintrack export ~/Downloads -t json
 ```
 
 **Export arguments:**
+
 - `path` (positional, required) – Directory where file will be created
 - `-t, --type TYPE` (optional) – File type: csv or json (defaults to json)
 
@@ -245,34 +253,34 @@ fintrack clear
 
 ## Common Commands
 
-| Task                          | Command                                                            |
-| ----------------------------- | ------------------------------------------------------------------ |
-| Initialize tracker            | `fintrack init -c NGN`                                             |
-| Initialize with opening       | `fintrack init -c NGN -o 1000`                                    |
-| Add record                    | `fintrack add Income 4000 -s Wages`                               |
-| Add with description          | `fintrack add Expenses 150.50 -s Groceries -d "Weekly shop"`      |
-| Update record                 | `fintrack update 5 -a 200 -d "Updated"`                           |
-| List all records              | `fintrack list`                                                    |
-| List first 5                  | `fintrack list -f 5`                                               |
-| List last 10                  | `fintrack list -l 10`                                              |
-| Filter by category            | `fintrack list -c Income`                                          |
-| Filter by date range          | `fintrack list -S 01-12-2025 -E 31-12-2025`                        |
-| View totals                   | `fintrack total`                                                   |
-| Delete record by ID           | `fintrack delete -i 5`                                             |
-| Delete multiple IDs           | `fintrack delete -i 1,2,3`                                         |
-| Delete by category            | `fintrack delete -c Expenses`                                      |
-| Delete by subcategory         | `fintrack delete -s Groceries`                                     |
-| View categories               | `fintrack category list`                                           |
-| View subcategories            | `fintrack subcategory list`                                        |
-| Add subcategory               | `fintrack subcategory add Shopping`                                |
-| Rename subcategory            | `fintrack subcategory rename Old New`                              |
-| Delete subcategory            | `fintrack subcategory delete Shopping`                             |
-| Describe data                 | `fintrack describe`                                                |
-| Export to CSV                 | `fintrack export ~/Downloads -t csv`                               |
-| Export to JSON                | `fintrack export ~/Downloads -t json`                              |
-| View raw JSON                 | `fintrack dump`                                                    |
-| Clear all data                | `fintrack clear`                                                   |
-| Get help                      | `fintrack help`                                                    |
+| Task                    | Command                                                      |
+| ----------------------- | ------------------------------------------------------------ |
+| Initialize tracker      | `fintrack init -c NGN`                                       |
+| Initialize with opening | `fintrack init -c NGN -o 1000`                               |
+| Add record              | `fintrack add Income 4000 -s Wages`                          |
+| Add with description    | `fintrack add Expenses 150.50 -s Groceries -d "Weekly shop"` |
+| Update record           | `fintrack update 5 -a 200 -d "Updated"`                      |
+| List all records        | `fintrack list`                                              |
+| List first 5            | `fintrack list -f 5`                                         |
+| List last 10            | `fintrack list -l 10`                                        |
+| Filter by category      | `fintrack list -c Income`                                    |
+| Filter by date range    | `fintrack list -S 01-12-2025 -E 31-12-2025`                  |
+| View totals             | `fintrack total`                                             |
+| Delete record by ID     | `fintrack delete -i 5`                                       |
+| Delete multiple IDs     | `fintrack delete -i 1,2,3`                                   |
+| Delete by category      | `fintrack delete -c Expenses`                                |
+| Delete by subcategory   | `fintrack delete -s Groceries`                               |
+| View categories         | `fintrack category list`                                     |
+| View subcategories      | `fintrack subcategory list`                                  |
+| Add subcategory         | `fintrack subcategory add Shopping`                          |
+| Rename subcategory      | `fintrack subcategory rename Old New`                        |
+| Delete subcategory      | `fintrack subcategory delete Shopping`                       |
+| Describe data           | `fintrack describe`                                          |
+| Export to CSV           | `fintrack export ~/Downloads -t csv`                         |
+| Export to JSON          | `fintrack export ~/Downloads -t json`                        |
+| View raw JSON           | `fintrack dump`                                              |
+| Clear all data          | `fintrack clear`                                             |
+| Get help                | `fintrack help`                                              |
 
 ## Data Formats
 
@@ -289,15 +297,12 @@ All your data is stored locally:
 ```
 ~/.fintrack/
 ├── tracker.json           # Your financial data
-└── backups/
-    └── tracker.backup.*.json  # Automatic backups for recovery
+└── backups/               # Directory for future backup functionality
 ```
 
 You can safely back up the entire `~/.fintrack/` directory to protect your data.
 
-## Automatic Backups & Recovery
-
-FinTrack automatically creates timestamped backups before any changes. If your data becomes corrupted, FinTrack will automatically restore from the latest backup and notify you.
+## Data Safety
 
 You can view your current data anytime:
 
@@ -306,6 +311,8 @@ fintrack dump
 ```
 
 This pretty-prints your `tracker.json` to the terminal.
+
+**Note:** Automatic backups are not currently implemented. It's recommended to manually back up your `~/.fintrack/` directory periodically.
 
 ## Examples
 
@@ -355,6 +362,7 @@ fintrack describe
 ```
 
 This provides insights like:
+
 - Total records and date range
 - Spending breakdown by category
 - Top subcategories
@@ -401,13 +409,13 @@ fintrack delete -s Groceries
 
 ### Data seems corrupted or missing
 
-FinTrack automatically detected corruption and restored from the latest backup. Run:
+Run:
 
 ```bash
 fintrack dump
 ```
 
-to inspect your data. If something is still wrong, contact support or check GitHub issues.
+to inspect your data. If something is wrong, you may need to restore from a manual backup or start fresh with `fintrack clear` and `fintrack init`.
 
 ## Future Features
 
@@ -429,7 +437,7 @@ MIT License. See LICENSE file for details.
 
 ## Want to Know More?
 
-Interested in the technical design and architecture decisions behind FinTrack? Check out the **[Design Document](./docs/design.md)** for a comprehensive deep-dive into how the tool is built, including data structures, error handling, backup strategies, and the reasoning behind each decision.
+Interested in the technical design and architecture decisions behind FinTrack? Check out the **[Design Document](./docs/design.md)** for a comprehensive deep-dive into how the tool is built, including data structures, error handling, and the reasoning behind each decision.
 
 ---
 

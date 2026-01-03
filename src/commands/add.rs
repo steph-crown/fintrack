@@ -4,7 +4,7 @@ use clap::{Arg, ArgMatches, Command};
 use crate::command_prelude::ArgMatchesExt;
 use crate::parsers::parse_date;
 use crate::utils::file::{FilePath, write_json_to_file};
-use crate::{Category, CliError, CliResponse, CliResult, GlobalContext, Record, TrackerData};
+use crate::{Category, CliError, CliResponse, CliResult, GlobalContext, Record, ResponseContent, TrackerData};
 
 pub fn cli() -> Command {
   Command::new("add")
@@ -48,6 +48,13 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
 
   let category = args.get_category("category")?;
   let amount = args.get_f64_or_default("amount");
+
+  if amount <= 0.0 {
+    return Err(CliError::ValidationError(
+      crate::ValidationErrorKind::AmountTooSmall { amount },
+    ));
+  }
+
   let subcategory_name = args.get_subcategory_or_default("subcategory");
   let description = args.get_string_or_default("description");
 
@@ -79,10 +86,13 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
 
   tracker_data.next_record_id += 1;
   tracker_data.last_modified = chrono::Utc::now().to_rfc3339();
-  tracker_data.push_record(record);
+  tracker_data.push_record(record.clone());
 
   let tracker_json = serde_json::json!(tracker_data);
   write_json_to_file(&tracker_json, &mut file)?;
 
-  Ok(CliResponse::success())
+  Ok(CliResponse::new(ResponseContent::Record {
+    record,
+    tracker_data,
+  }))
 }

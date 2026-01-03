@@ -36,13 +36,13 @@ FinTrack follows a modular, layered architecture:
 ┌────────────────────▼────────────────────────────────┐
 │            Business Logic Layer (lib.rs)            │
 │  Validation, file I/O, data transformation,         │
-│  backup/recovery, serialization                     │
+│  serialization                                       │
 └────────────────────┬────────────────────────────────┘
                      │
 ┌────────────────────▼────────────────────────────────┐
 │           Persistent Storage Layer                  │
 │  ~/.fintrack/tracker.json (main data)               │
-│  ~/.fintrack/backups/tracker.backup.*.json (backup) │
+│  ~/.fintrack/backups/ (future backup location)      │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -55,7 +55,7 @@ fintrack/
 │   ├── lib.rs                  # Shared functions, validation, I/O
 │   ├── error.rs                # Error types and handling
 │   ├── models.rs               # Data structures (TrackerData, Record, etc.)
-│   ├── storage.rs              # File I/O, backup/recovery logic
+│   ├── utils/file.rs            # File I/O utilities
 │   ├── modules/
 │   │   ├── init.rs             # Initialize tracker
 │   │   ├── add.rs              # Add record
@@ -114,9 +114,9 @@ fintrack/
 }
 ```
 
-**Backup File:** `~/.fintrack/backups/tracker.backup.2025-12-30T14-45-30Z.json`
+**Backup File (Future):** `~/.fintrack/backups/tracker.backup.2025-12-30T14-45-30Z.json`
 
-Backups use the same structure as the primary file, with ISO 8601 timestamps in the filename for easy sorting and identification.
+When implemented, backups would use the same structure as the primary file, with ISO 8601 timestamps in the filename for easy sorting and identification.
 
 ### 3.2 Data Structures (Rust Models)
 
@@ -289,7 +289,6 @@ fintrack add Expenses 150.50 -s Groceries -d "Weekly shop" -D 28-12-2025
 - Validates category exists, amount > 0, date is valid, subcategory exists
 - Auto-generates record ID (incremental)
 - Updates `last_modified` timestamp
-- Creates backup before mutation
 - On success, displays: `"✓ Success"` (record details shown via `ResponseContent::Record`)
 
 ---
@@ -321,7 +320,6 @@ fintrack delete -s Groceries
 - For `-c, --by-cat`: Deletes all records with the specified category
 - For `-s, --by-subcat`: Deletes all records with the specified subcategory
 - Updates `last_modified` timestamp
-- Creates backup before mutation
 - On success, displays: `"✓ Success"`
 
 ---
@@ -358,10 +356,9 @@ fintrack update 5 -s Wages -d "Updated description"
 - `record_id` is a required positional argument
 - At least one optional flag should be provided (not enforced, but recommended)
 - Validates record ID exists
-- Validates each provided field against rules
+- Validates each provided field against rules (including amount > 0 if provided)
 - Updates only specified fields; others remain unchanged
 - Updates `last_modified` timestamp
-- Creates backup before mutation
 - On success, displays: `"✓ Success"`
 
 ---
@@ -467,7 +464,6 @@ fintrack subcategory add <NAME>
 - Cannot create "Miscellaneous" (system subcategory)
 - Auto-generates subcategory ID
 - Updates `last_modified` timestamp
-- Creates backup before mutation
 - On success: `"✓ Subcategory 'Groceries' added (ID: 2)"`
 
 #### Delete subcategory:
@@ -483,7 +479,7 @@ fintrack subcategory delete <NAME>
 - If records exist, displays error: `"Cannot delete 'Groceries'—it has 5 records. Delete those records first using 'fintrack delete -s Groceries', or manually delete individual records."`
 - Cannot delete "Miscellaneous" (system subcategory)
 - If no records, deletes and displays: `"✓ Subcategory 'Groceries' deleted."`
-- Updates `last_modified` timestamp, creates backup before mutation
+- Updates `last_modified` timestamp
 
 #### Rename subcategory:
 
@@ -499,7 +495,7 @@ fintrack subcategory rename <OLD> <NEW>
 - Updates the name in `subcategories_by_id` and `subcategories_by_name`
 - Records continue to reference the ID (no record updates needed)
 - On success: `"✓ Subcategory renamed: 'Groceries' → 'Food & Groceries'"`
-- Updates `last_modified` timestamp, creates backup before mutation
+- Updates `last_modified` timestamp
 
 ---
 
@@ -511,12 +507,12 @@ fintrack total
 
 **Behavior:**
 
-- Computes total income, total expenses, and net (income - expenses)
+- Computes total income, total expenses, and net (opening_balance + income - expenses)
 - Displays with currency symbol
 - Output:
   ```
   Financial Summary:
-    Initial Balance:     300.00 NGN
+    Opening Balance:     300.00 NGN
     Total Income:    125,500.00 NGN
     Total Expenses:   45,230.50 NGN
     ──────────────────────────────
@@ -534,7 +530,7 @@ fintrack clear
 **Behavior:**
 
 - Displays confirmation prompt: `"Delete ALL data? This cannot be undone. (yes/no)"`
-- If user confirms, deletes `tracker.json` and all backups
+- If user confirms, deletes `tracker.json` and the entire `~/.fintrack/` directory
 - Resets state to uninitialized
 - If user cancels: `"Clear cancelled."`
 - On success: `"✓ All data cleared. Run 'fintrack init' to start over."`
@@ -638,19 +634,14 @@ fintrack -h
 ~/.fintrack/
 ├── tracker.json                              # Primary data file
 ├── config                                    # (Future) Config file
-└── backups/
-    ├── tracker.backup.2025-12-30T10-30-00Z.json
-    ├── tracker.backup.2025-12-30T12-15-45Z.json
-    └── tracker.backup.2025-12-30T14-45-30Z.json
+└── backups/                                  # Directory for future backup functionality
 ```
 
 **Backup Policy:**
 
-- One backup is maintained at a time
-- Before any mutation (add/update/delete), the current `tracker.json` is copied to `backups/` with a timestamped filename
-- After successful command completion, the old backup is deleted
-- If corruption is detected on startup, the latest backup is restored and user is notified
-- User can manually inspect backups in the `backups/` directory
+- **Note:** Automatic backup functionality is not currently implemented
+- The `backups/` directory is created during initialization for future use
+- Users are recommended to manually back up their `~/.fintrack/` directory periodically
 
 ---
 
@@ -803,40 +794,19 @@ All input is validated before mutation:
 
 ### 6.3 Corruption Detection and Recovery
 
-**On startup (before any operation):**
+**Note:** Automatic backup and recovery functionality is not currently implemented. Users are recommended to manually back up their `~/.fintrack/` directory periodically.
 
-```rust
-fn load_tracker(tracker_path: &Path, backup_path: &Path) -> Result<TrackerData, ProcessError> {
-    // 1. Try to load tracker.json
-    match std::fs::read_to_string(tracker_path) {
-        Ok(content) => {
-            // 2. Try to deserialize and validate
-            match serde_json::from_str(&content) {
-                Ok(data) => validate(&data),
-                Err(_) => {
-                    // 3. If corrupt, try backup
-                    restore_from_backup(backup_path)
-                }
-            }
-        }
-        Err(_) => {
-            // File doesn't exist, try backup
-            restore_from_backup(backup_path)
-        }
-    }
-}
-```
+**Future Implementation:**
 
-**On corruption:**
+When implemented, corruption detection and recovery would follow this pattern:
 
-- Latest backup is restored to `tracker.json`
-- User is notified: `"⚠ Your data was corrupted and restored from backup created at 2025-12-30T14:45:30Z. Please verify your recent changes."`
-- Both files are now in sync; old backup is deleted after first successful command
-- If both main and backup are corrupted: `"✗ Fatal: Both tracker.json and backup are corrupted. Unable to recover. Run 'fintrack dump' to inspect remaining data, or 'fintrack clear' to reset."`
+1. On startup, attempt to load and validate `tracker.json`
+2. If corruption is detected, attempt to restore from the latest backup
+3. Notify the user of any restoration actions taken
 
-### 6.3 Atomic Mutations with Backup
+**Future Atomic Mutations:**
 
-**Every mutation follows this pattern:**
+When backup functionality is implemented, mutations would follow this pattern:
 
 1. Load and validate current `tracker.json`
 2. Create timestamped backup in `~/.fintrack/backups/`
@@ -846,7 +816,7 @@ fn load_tracker(tracker_path: &Path, backup_path: &Path) -> Result<TrackerData, 
 6. On success, delete old backup
 7. On failure, restore from backup and surface error to user
 
-This ensures data is never in a partially-written state.
+This would ensure data is never in a partially-written state.
 
 ---
 
@@ -901,9 +871,8 @@ This ensures data is never in a partially-written state.
 ### 8.2 Integration Tests
 
 - **File I/O:** Create test tracker files, perform operations, verify state
-- **Backup/recovery:** Corrupt a test file, verify recovery logic
-- **Atomic mutations:** Verify that failed operations don't partially write state
 - **End-to-end:** Full command flows (init → add → list → delete → total)
+- **Validation:** Test amount validation, date validation, subcategory validation
 
 ### 8.3 Test Structure
 
@@ -926,10 +895,10 @@ mod tests {
     fn test_add_record_invalid_amount() { }
 
     #[test]
-    fn test_backup_created_before_mutation() { }
+    fn test_amount_validation() { }
 
     #[test]
-    fn test_corruption_recovery() { }
+    fn test_clear_confirmation() { }
     // ... many more
 }
 ```
@@ -1020,18 +989,20 @@ Suggestion: Verify your recent changes. Manual inspection available with 'fintra
 - `fintrack list` (all variants)
 - `fintrack category list`
 - `fintrack subcategory` (list, add, delete, update/rename)
-- `fintrack clear`
+- `fintrack clear` (with confirmation prompt)
 - `fintrack total`
 - `fintrack dump`
-- Full backup/recovery system
-- Comprehensive validation
+- Comprehensive validation (including amount > 0)
 - Table-based output formatting
 - Help/documentation
 
+**Note:** Automatic backup/recovery system is deferred to a future phase.
+
 ### Phase 2 (Post-MVP)
 
-- `fintrack describe` (EDA)
-- `fintrack export` (CSV, later JSON)
+- `fintrack describe` (EDA) ✅
+- `fintrack export` (CSV, JSON) ✅
+- Full backup/recovery system
 - Autocompletion (bash, zsh, fish)
 - Configuration file (`~/.fintrack/config`)
 - Performance optimizations
@@ -1076,9 +1047,11 @@ subcategories_by_name: HashMap<String, usize>,
 
 **Why:** Allows clean separation of concerns, easy testing, and consistent error reporting across all commands.
 
-### 12.5 Single Backup Policy
+### 12.5 Backup Policy (Deferred)
 
-**Why:** Simplicity for MVP. Sufficient for recovery from corruption or accidental deletion. History/undo deferred to future.
+**Status:** Automatic backup functionality is deferred to a future phase. The `backups/` directory is created during initialization to prepare for future implementation.
+
+**Why Deferred:** Focus on core functionality first. Users can manually back up their `~/.fintrack/` directory. When implemented, a single backup policy will provide sufficient recovery from corruption or accidental deletion.
 
 ---
 
@@ -1136,10 +1109,10 @@ Allow users to manage multiple independent trackers (e.g., personal and business
 
 A world-class financial tracker is:
 
-- **Reliable:** Data is never lost; corruption is detected and recovered
+- **Reliable:** Simple and robust data storage ensures data safety
 - **Fast:** Instant operations even with thousands of records
 - **Simple:** Easy to learn and use; no unnecessary complexity
-- **Safe:** Atomic mutations; no partial writes; backups always available
+- **Safe:** Reliable file operations ensure data integrity
 - **Transparent:** User owns all data; no remote dependencies
 - **Well-tested:** High coverage; edge cases handled
 - **User-friendly:** Clear error messages; helpful feedback
