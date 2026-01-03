@@ -1,4 +1,3 @@
-use chrono::Local;
 use clap::{Arg, ArgMatches, Command};
 
 use crate::command_prelude::ArgMatchesExt;
@@ -51,17 +50,17 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   let mut file = gctx.tracker_path().open_read_write()?;
   let mut tracker_data: TrackerData = serde_json::from_reader(&file)?;
 
-  let record_id = args.get_one::<usize>("record_id").copied().ok_or_else(|| {
+  let record_id = args.get_usize("record_id").map_err(|_| {
     CliError::ValidationError(crate::ValidationErrorKind::RecordNotFound { id: 0 })
   })?;
 
-  let category_id = args.value_of_category_opt("category").map(|category| {
+  let category_id = args.get_category_opt("category").map(|category| {
     let category_str = category.to_string();
     tracker_data.category_id(&category_str)
   });
 
   let subcategory_id = args
-    .value_of_subcategory_opt("subcategory")
+    .get_subcategory_opt("subcategory")
     .map(|name| {
       tracker_data.subcategory_id(&name).ok_or_else(|| {
         CliError::ValidationError(crate::ValidationErrorKind::SubcategoryNotFound { name })
@@ -81,7 +80,7 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
     record.category = cat_id;
   }
 
-  if let Some(&amount) = args.value_of_f64_opt("amount") {
+  if let Some(amount) = args.get_f64_opt("amount") {
     record.amount = amount;
   }
 
@@ -89,12 +88,12 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
     record.subcategory = subcat_id;
   }
 
-  if let Some(description) = args.value_of_string_opt("description") {
+  if let Some(description) = args.get_string_opt("description") {
     record.description = description;
   }
 
-  if let Some(date) = args.value_of_date("date") {
-    record.date = date;
+  if let Some(date) = args.get_date_opt("date") {
+    record.date = date.format("%d-%m-%Y").to_string();
   }
 
   tracker_data.last_modified = chrono::Utc::now().to_rfc3339();

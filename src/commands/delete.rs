@@ -47,19 +47,19 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   let mut tracker_data: TrackerData = serde_json::from_reader(&file)?;
 
   if args.contains_id("ids") {
-    let ids: Vec<usize> = args.value_of_vec::<usize>("ids");
+    let ids: Vec<usize> = args.get_vec::<usize>("ids");
     let ids_set: HashSet<usize> = ids.into_iter().collect();
 
     tracker_data.records.retain(|r| !ids_set.contains(&r.id));
   } else if args.contains_id("by-cat") {
-    let category = args.value_of_category("by-cat")?;
+    let category = args.get_category("by-cat")?;
     let category_str = category.to_string();
     let category_id = tracker_data.category_id(&category_str);
 
     tracker_data.records.retain(|r| r.category != category_id);
   } else if args.contains_id("by-subcat") {
     let subcategory_name = args
-      .value_of_subcategory_opt("by-subcat")
+      .get_subcategory_opt("by-subcat")
       .ok_or_else(|| crate::CliError::Other("Subcategory not provided".to_string()))?;
 
     let subcategory_id = tracker_data

@@ -46,10 +46,10 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   let mut file = gctx.tracker_path().open_read_write()?;
   let mut tracker_data: TrackerData = serde_json::from_reader(&file)?;
 
-  let category = args.value_of_category("category")?;
-  let amount = *args.value_of_f64_or_zero("amount");
-  let subcategory_name = args.value_of_subcategory("subcategory");
-  let description = args.value_of_string("description");
+  let category = args.get_category("category")?;
+  let amount = args.get_f64_or_default("amount");
+  let subcategory_name = args.get_subcategory_or_default("subcategory");
+  let description = args.get_string_or_default("description");
 
   let category_str = category.to_string();
   let category_id = tracker_data.category_id(&category_str);
@@ -63,7 +63,8 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
     })?;
 
   let date = args
-    .value_of_date("date")
+    .get_date_opt("date")
+    .map(|d| d.format("%d-%m-%Y").to_string())
     .unwrap_or_else(|| Local::now().format("%d-%m-%Y").to_string());
 
   let record_id = tracker_data.next_record_id;
