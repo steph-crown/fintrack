@@ -269,8 +269,14 @@ pub fn write_response(res: &crate::CliResponse, writer: &mut impl io::Write) -> 
     ResponseContent::Record {
       record,
       tracker_data,
+      is_update,
     } => {
-      writeln!(writer, "{} Record created:", "✓".green().bold())?;
+      let message = if *is_update {
+        "Record updated:"
+      } else {
+        "Record created:"
+      };
+      writeln!(writer, "{} {}", "✓".green().bold(), message.bright_green())?;
       let currency_enum = tracker_data.currency.parse::<Currency>().ok();
       write_record_single(&record, Some(tracker_data), currency_enum.as_ref(), writer)?;
     }

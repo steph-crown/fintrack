@@ -1,8 +1,8 @@
 use clap::{Arg, ArgMatches, Command};
 
 use crate::command_prelude::ArgMatchesExt;
-use crate::parsers::parse_date;
 use crate::utils::file::{FilePath, write_json_to_file};
+use crate::utils::parsers::{parse_category, parse_date};
 use crate::{Category, CliError, CliResponse, CliResult, GlobalContext, ResponseContent, TrackerData};
 
 pub fn cli() -> Command {
@@ -18,7 +18,7 @@ pub fn cli() -> Command {
       Arg::new("category")
         .short('c')
         .long("category")
-        .value_parser(clap::value_parser!(Category)),
+        .value_parser(parse_category),
     )
     .arg(
       Arg::new("amount")
@@ -111,5 +111,6 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
   Ok(CliResponse::new(ResponseContent::Record {
     record: updated_record,
     tracker_data,
+    is_update: true,
   }))
 }

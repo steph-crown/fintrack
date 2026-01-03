@@ -1,4 +1,7 @@
 use chrono::NaiveDate;
+use strum::EnumString;
+
+use crate::Category;
 
 /// Parse a date string in DD-MM-YYYY format
 ///
@@ -7,6 +10,15 @@ use chrono::NaiveDate;
 pub fn parse_date(s: &str) -> Result<NaiveDate, String> {
   NaiveDate::parse_from_str(s, "%d-%m-%Y")
     .map_err(|_| format!("'{}' is not in the format DD-MM-YYYY", s))
+}
+
+/// Parse a category string case-insensitively
+///
+/// Accepts "income", "Income", "INCOME", "expenses", "Expenses", "EXPENSES", etc.
+/// Used as a clap value parser for category arguments.
+pub fn parse_category(s: &str) -> Result<Category, String> {
+  s.parse::<Category>()
+    .map_err(|_| format!("'{}' is not a valid category. Use 'income' or 'expenses'", s))
 }
 
 /// Parse a label string. Used for categories and subcategories

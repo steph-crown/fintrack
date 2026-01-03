@@ -6,6 +6,7 @@ use crate::{
   Category, CliResponse, CliResult, GlobalContext, TrackerData,
   command_prelude::ArgMatchesExt,
   utils::file::{FilePath, write_json_to_file},
+  utils::parsers::parse_category,
 };
 
 pub fn cli() -> Command {
@@ -25,7 +26,7 @@ pub fn cli() -> Command {
         .help("Specify a category. Deletes record for the category")
         .short('c')
         .long("by-cat")
-        .value_parser(clap::value_parser!(Category)),
+        .value_parser(parse_category),
     )
     .arg(
       Arg::new("by-subcat")

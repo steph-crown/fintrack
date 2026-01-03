@@ -2,8 +2,8 @@ use chrono::NaiveDate;
 use clap::{Arg, ArgGroup, ArgMatches, Command};
 
 use crate::command_prelude::ArgMatchesExt;
-use crate::parsers::parse_date;
 use crate::utils::file::FilePath;
+use crate::utils::parsers::{parse_category, parse_date};
 use crate::{Category, CliResponse, CliResult, GlobalContext, Record, ResponseContent, TrackerData};
 
 pub fn cli() -> Command {
@@ -42,7 +42,7 @@ pub fn cli() -> Command {
       Arg::new("category")
         .short('c')
         .long("category")
-        .value_parser(clap::value_parser!(Category)),
+        .value_parser(parse_category),
     )
     .arg(
       Arg::new("subcategory")

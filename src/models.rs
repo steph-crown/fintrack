@@ -54,7 +54,11 @@ pub struct DescribeData {
 
 pub enum ResponseContent {
   Message(String),
-  Record { record: Record, tracker_data: TrackerData },
+  Record {
+    record: Record,
+    tracker_data: TrackerData,
+    is_update: bool,
+  },
   List { records: Vec<Record>, tracker_data: TrackerData },
   TrackerData(TrackerData),
   Total(Total),
@@ -77,20 +81,13 @@ pub enum Currency {
   JPY,
 }
 
-#[derive(clap::ValueEnum, Clone, Debug)]
+#[derive(clap::ValueEnum, Clone, Debug, strum::Display, strum::EnumString)]
+#[strum(serialize_all = "lowercase", ascii_case_insensitive)]
 pub enum Category {
   Income,
   Expenses,
 }
 
-impl std::fmt::Display for Category {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    match self {
-      Category::Income => write!(f, "income"),
-      Category::Expenses => write!(f, "expenses"),
-    }
-  }
-}
 
 #[derive(clap::ValueEnum, Clone, Debug)]
 pub enum ExportFileType {
