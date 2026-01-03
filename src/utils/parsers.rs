@@ -45,3 +45,88 @@ pub fn parse_label(s: &str) -> Result<String, String> {
 
   Ok(s.to_string())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_date_valid() {
+        use chrono::Datelike;
+        let date = parse_date("01-01-2025").unwrap();
+        assert_eq!(date.day(), 1);
+        assert_eq!(date.month(), 1);
+        assert_eq!(date.year(), 2025);
+    }
+
+    #[test]
+    fn test_parse_date_invalid_format() {
+        assert!(parse_date("2025-01-01").is_err());
+        assert!(parse_date("01/01/2025").is_err());
+        // Note: "1-1-2025" actually parses successfully with chrono's lenient parsing
+        // So we test with a clearly invalid format instead
+        assert!(parse_date("invalid").is_err());
+    }
+
+    #[test]
+    fn test_parse_date_invalid_date() {
+        assert!(parse_date("32-01-2025").is_err());
+        assert!(parse_date("01-13-2025").is_err());
+    }
+
+    #[test]
+    fn test_parse_category_valid() {
+        assert!(matches!(parse_category("income").unwrap(), Category::Income));
+        assert!(matches!(parse_category("Income").unwrap(), Category::Income));
+        assert!(matches!(parse_category("INCOME").unwrap(), Category::Income));
+        assert!(matches!(parse_category("expenses").unwrap(), Category::Expenses));
+        assert!(matches!(parse_category("Expenses").unwrap(), Category::Expenses));
+        assert!(matches!(parse_category("EXPENSES").unwrap(), Category::Expenses));
+    }
+
+    #[test]
+    fn test_parse_category_invalid() {
+        assert!(parse_category("invalid").is_err());
+        assert!(parse_category("").is_err());
+        assert!(parse_category("incomee").is_err());
+    }
+
+    #[test]
+    fn test_parse_label_valid() {
+        assert_eq!(parse_label("Groceries").unwrap(), "Groceries");
+        assert_eq!(parse_label("Salary").unwrap(), "Salary");
+        assert_eq!(parse_label("Rent_Payment").unwrap(), "Rent_Payment");
+        assert_eq!(parse_label("Item123").unwrap(), "Item123");
+        assert_eq!(parse_label("a").unwrap(), "a");
+    }
+
+    #[test]
+    fn test_parse_label_empty() {
+        assert!(parse_label("").is_err());
+    }
+
+    #[test]
+    fn test_parse_label_starts_with_number() {
+        assert!(parse_label("123Item").is_err());
+        assert!(parse_label("0test").is_err());
+    }
+
+    #[test]
+    fn test_parse_label_starts_with_underscore() {
+        assert!(parse_label("_test").is_err());
+    }
+
+    #[test]
+    fn test_parse_label_invalid_characters() {
+        assert!(parse_label("test-item").is_err());
+        assert!(parse_label("test item").is_err());
+        assert!(parse_label("test@item").is_err());
+        assert!(parse_label("test.item").is_err());
+    }
+
+    #[test]
+    fn test_parse_label_allows_underscore_in_middle() {
+        assert_eq!(parse_label("test_item").unwrap(), "test_item");
+        assert_eq!(parse_label("test_item_123").unwrap(), "test_item_123");
+    }
+}

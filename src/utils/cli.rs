@@ -33,6 +33,9 @@ pub trait ArgMatchesExt {
 
   // Collection extractors
   fn get_vec<T: Clone + Send + Sync + 'static>(&self, id: &str) -> Vec<T>;
+
+  // Check if argument was provided
+  fn contains_id(&self, id: &str) -> bool;
 }
 
 impl ArgMatchesExt for ArgMatches {
@@ -113,5 +116,162 @@ impl ArgMatchesExt for ArgMatches {
       .get_many::<T>(id)
       .map(|iter| iter.cloned().collect())
       .unwrap_or_default()
+  }
+
+  fn contains_id(&self, id: &str) -> bool {
+    ArgMatches::contains_id(self, id)
+  }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::Command;
+
+    fn create_test_command() -> Command {
+        Command::new("test")
+            .arg(clap::Arg::new("category").value_parser(crate::utils::parsers::parse_category))
+            .arg(clap::Arg::new("amount").short('a').long("amount").value_parser(clap::value_parser!(f64)))
+            .arg(clap::Arg::new("id").short('i').long("id").value_parser(clap::value_parser!(usize)))
+            .arg(clap::Arg::new("text").short('t').long("text").value_parser(clap::value_parser!(String)))
+            .arg(clap::Arg::new("date").short('D').long("date").value_parser(crate::utils::parsers::parse_date))
+            .arg(clap::Arg::new("currency").short('c').long("currency").value_parser(clap::value_parser!(Currency)))
+            .arg(clap::Arg::new("ids").long("ids").value_parser(clap::value_parser!(usize)).action(clap::ArgAction::Append))
+    }
+
+    #[test]
+    fn test_get_category() {
+        let cmd = create_test_command();
+        let matches = cmd.get_matches_from(&["test", "income"]);
+
+        let category = matches.get_category("category").unwrap();
+        assert!(matches!(category, &Category::Income));
+    }
+
+    #[test]
+    fn test_get_category_missing() {
+        let cmd = create_test_command();
+        let matches = cmd.get_matches_from(&["test"]);
+
+        let result = matches.get_category("category");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_get_category_opt() {
+        let cmd = create_test_command();
+        let matches = cmd.get_matches_from(&["test", "expenses"]);
+
+        let category = matches.get_category_opt("category").unwrap();
+        assert!(matches!(category, &Category::Expenses));
+    }
+
+    #[test]
+    fn test_get_category_opt_missing() {
+        let cmd = create_test_command();
+        let matches = cmd.get_matches_from(&["test"]);
+
+        assert!(matches.get_category_opt("category").is_none());
+    }
+
+    #[test]
+    fn test_get_f64_opt() {
+        let cmd = create_test_command();
+        let matches = cmd.get_matches_from(&["test", "--amount", "100.5"]);
+
+        assert_eq!(matches.get_f64_opt("amount"), Some(100.5));
+    }
+
+    #[test]
+    fn test_get_f64_or_default() {
+        let cmd1 = create_test_command();
+        let cmd2 = create_test_command();
+        let matches1 = cmd1.get_matches_from(&["test", "--amount", "100.5"]);
+        let matches2 = cmd2.get_matches_from(&["test"]);
+
+        assert_eq!(matches1.get_f64_or_default("amount"), 100.5);
+        assert_eq!(matches2.get_f64_or_default("amount"), 0.0);
+    }
+
+    #[test]
+    fn test_get_usize() {
+        let cmd = create_test_command();
+        let matches = cmd.get_matches_from(&["test", "--id", "42"]);
+
+        assert_eq!(matches.get_usize("id").unwrap(), 42);
+    }
+
+    #[test]
+    fn test_get_usize_or_default() {
+        let cmd1 = create_test_command();
+        let cmd2 = create_test_command();
+        let matches1 = cmd1.get_matches_from(&["test", "--id", "42"]);
+        let matches2 = cmd2.get_matches_from(&["test"]);
+
+        assert_eq!(matches1.get_usize_or_default("id"), 42);
+        assert_eq!(matches2.get_usize_or_default("id"), 0);
+    }
+
+    #[test]
+    fn test_get_string_or_default() {
+        let cmd1 = create_test_command();
+        let cmd2 = create_test_command();
+        let matches1 = cmd1.get_matches_from(&["test", "--text", "hello"]);
+        let matches2 = cmd2.get_matches_from(&["test"]);
+
+        assert_eq!(matches1.get_string_or_default("text"), "hello");
+        assert_eq!(matches2.get_string_or_default("text"), "");
+    }
+
+    #[test]
+    fn test_get_subcategory_or_default() {
+        let cmd1 = create_test_command();
+        let cmd2 = create_test_command();
+        let matches1 = cmd1.get_matches_from(&["test", "--text", "groceries"]);
+        let matches2 = cmd2.get_matches_from(&["test"]);
+
+        assert_eq!(matches1.get_subcategory_or_default("text"), "groceries");
+        assert_eq!(matches2.get_subcategory_or_default("text"), "miscellaneous");
+    }
+
+    #[test]
+    fn test_get_date_opt() {
+        use chrono::Datelike;
+        let cmd = create_test_command();
+        let matches = cmd.get_matches_from(&["test", "--date", "15-01-2025"]);
+
+        let date = matches.get_date_opt("date").unwrap();
+        assert_eq!(date.day(), 15);
+        assert_eq!(date.month(), 1);
+        assert_eq!(date.year(), 2025);
+    }
+
+    #[test]
+    fn test_get_currency_or_default() {
+        let cmd1 = create_test_command();
+        let cmd2 = create_test_command();
+        let matches1 = cmd1.get_matches_from(&["test", "--currency", "usd"]);
+        let matches2 = cmd2.get_matches_from(&["test"]);
+
+        assert!(matches!(matches1.get_currency_or_default("currency"), &Currency::USD));
+        assert!(matches!(matches2.get_currency_or_default("currency"), &Currency::NGN));
+    }
+
+    #[test]
+    fn test_get_vec() {
+        let cmd = create_test_command();
+        let matches = cmd.get_matches_from(&["test", "--ids", "1", "--ids", "2", "--ids", "3"]);
+
+        let ids: Vec<usize> = matches.get_vec("ids");
+        assert_eq!(ids, vec![1, 2, 3]);
+    }
+
+    #[test]
+    fn test_get_vec_empty() {
+        let cmd = create_test_command();
+        let matches = cmd.get_matches_from(&["test"]);
+
+        let ids: Vec<usize> = matches.get_vec("ids");
+        assert_eq!(ids, Vec::<usize>::new());
   }
 }

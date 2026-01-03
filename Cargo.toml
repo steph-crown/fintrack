@@ -1,6 +1,6 @@
 [package]
 name = "fintrack"
-version = "1.0.0"
+version = "0.1.0"
 edition = "2024"
 authors = ["Stephen Emmanuel <emmanuelstephen024@gmail.com>"]
 description = "A local-first CLI financial tracker for managing income and expenses"
@@ -8,6 +8,7 @@ license = "MIT"
 repository = "https://github.com/steph-crown/fintrack"
 keywords = ["finance", "tracker", "cli", "budget", "expenses", "income"]
 categories = ["command-line-utilities", "financial"]
+homepage = "https://github.com/steph-crown/fintrack/readme.md"
 
 [dependencies]
 chrono = "0.4.42"
@@ -19,3 +20,6 @@ serde_core = "1.0.228"
 serde_json = "1.0.148"
 strum = { version = "0.26", features = ["derive"] }
 tabled = "0.15"
+
+[dev-dependencies]
+tempfile = "3.10"

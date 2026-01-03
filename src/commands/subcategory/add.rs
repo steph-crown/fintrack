@@ -38,18 +38,18 @@ pub fn exec(gctx: &mut GlobalContext, args: &ArgMatches) -> CliResult {
     }
   };
 
+  // Check if trying to create "Miscellaneous" (system subcategory)
+  if name_lower == "miscellaneous" {
+    return Err(CliError::ValidationError(
+      crate::ValidationErrorKind::CannotDeleteMiscellaneous,
+    ));
+  }
+
   if tracker_data.subcategories_by_name.contains_key(&name_lower) {
     return Err(CliError::ValidationError(
       crate::ValidationErrorKind::SubcategoryAlreadyExists {
         name: name_title.clone(),
       },
-    ));
-  }
-
-  // Check if trying to create "Miscellaneous" (system subcategory)
-  if name_lower == "miscellaneous" {
-    return Err(CliError::ValidationError(
-      crate::ValidationErrorKind::CannotDeleteMiscellaneous,
     ));
   }
 
