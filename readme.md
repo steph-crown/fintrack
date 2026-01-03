@@ -11,9 +11,23 @@ A local-first CLI financial tracker written in Rust. Track your income and expen
 
 ## Installation
 
+### Using Cargo (Recommended)
+
+If you have Rust installed, install FinTrack directly from [crates.io](https://crates.io/crates/fintrack):
+
+```bash
+cargo install fintrack
+```
+
+Then verify installation:
+
+```bash
+fintrack --version
+```
+
 ### From Source
 
-Requires Rust 1.70+. [Install Rust here](https://www.rust-lang.org/tools/install).
+To build from source, you'll need Rust 1.70+. [Install Rust here](https://www.rust-lang.org/tools/install).
 
 ```bash
 git clone https://github.com/steph-crown/fintrack.git

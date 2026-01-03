@@ -140,7 +140,7 @@ impl TrackerData {
   }
 
   pub fn subcategory_id(&self, name: &str) -> Option<usize> {
-    self.subcategories_by_name.get(name).copied()
+    self.subcategories_by_name.get(&name.to_lowercase()).copied()
   }
 
   pub fn category_name(&self, id: usize) -> Option<&String> {
@@ -245,6 +245,9 @@ mod tests {
     fn test_subcategory_id() {
         let tracker = create_test_tracker_data();
         assert_eq!(tracker.subcategory_id("miscellaneous"), Some(1));
+        assert_eq!(tracker.subcategory_id("Miscellaneous"), Some(1));
+        assert_eq!(tracker.subcategory_id("MISCELLANEOUS"), Some(1));
+        assert_eq!(tracker.subcategory_id("MiScElLaNeOuS"), Some(1));
         assert_eq!(tracker.subcategory_id("nonexistent"), None);
     }
 
