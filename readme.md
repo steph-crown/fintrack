@@ -11,33 +11,90 @@ A local-first CLI financial tracker written in Rust. Track your income and expen
 
 ## Installation
 
-### Install Prebuilt Binaries (Recommended)
+### macOS / Linux
 
-#### Shell Script (Linux/macOS)
+#### Option 1: Installer Script (Recommended)
+
+Run this command in your terminal:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/steph-crown/fintrack/releases/latest/download/fintrack-installer.sh | sh
 ```
 
-#### PowerShell Script (Windows)
+This automatically downloads and installs FinTrack, adding it to your PATH.
 
-```powershell
-powershell -ExecutionPolicy Bypass -c "irm https://github.com/steph-crown/fintrack/releases/latest/download/fintrack-installer.ps1 | iex"
-```
+#### Option 2: Manual Installation
 
-#### Homebrew (macOS/Linux)
+1. Download the appropriate `.tar.xz` file from the [Releases page](https://github.com/steph-crown/fintrack/releases/latest):
+
+   - **Apple Silicon Macs (M1/M2/M3)**: `fintrack-aarch64-apple-darwin.tar.xz`
+   - **Intel Macs**: `fintrack-x86_64-apple-darwin.tar.xz`
+   - **Linux (x64)**: `fintrack-x86_64-unknown-linux-gnu.tar.xz`
+   - **Linux (ARM64)**: `fintrack-aarch64-unknown-linux-gnu.tar.xz`
+   - **Alpine Linux**: `fintrack-x86_64-unknown-linux-musl.tar.xz`
+
+2. Extract the archive:
+
+   ```bash
+   tar -xf fintrack-*.tar.xz
+   ```
+
+3. Move the binary to a directory in your PATH (e.g., `/usr/local/bin` or `~/.local/bin`):
+
+   ```bash
+   mv fintrack /usr/local/bin/
+   ```
+
+4. Make it executable (if needed):
+   ```bash
+   chmod +x /usr/local/bin/fintrack
+   ```
+
+#### Option 3: Homebrew (macOS/Linux)
+
+If you use Homebrew:
 
 ```bash
 brew install steph-crown/fintrack/fintrack
 ```
 
-#### npm (Node.js)
+### Windows
+
+#### Option 1: PowerShell Installer Script (Recommended)
+
+Open PowerShell and run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -c "irm https://github.com/steph-crown/fintrack/releases/latest/download/fintrack-installer.ps1 | iex"
+```
+
+This automatically downloads and installs FinTrack, adding it to your PATH.
+
+#### Option 2: MSI Installer
+
+1. Download `fintrack-x86_64-pc-windows-msvc.msi` from the [Releases page](https://github.com/steph-crown/fintrack/releases/latest)
+2. Double-click the `.msi` file to run the installer
+3. Follow the installation wizard
+
+#### Option 3: Manual Installation
+
+1. Download `fintrack-x86_64-pc-windows-msvc.zip` from the [Releases page](https://github.com/steph-crown/fintrack/releases/latest)
+2. Extract the ZIP file to a location like `C:\Program Files\fintrack\`
+3. Add the folder to your system PATH:
+   - Open "Environment Variables" in Windows Settings
+   - Edit the `Path` variable
+   - Add the path to the folder containing `fintrack.exe`
+   - Restart your terminal
+
+### npm (All Platforms)
+
+If you have Node.js installed:
 
 ```bash
 npm install -g fintrack
 ```
 
-### Using Cargo
+### Cargo (Rust Users)
 
 If you have Rust installed, install FinTrack directly from [crates.io](https://crates.io/crates/fintrack):
 
@@ -45,15 +102,7 @@ If you have Rust installed, install FinTrack directly from [crates.io](https://c
 cargo install fintrack
 ```
 
-### From Source
-
-To build from source, you'll need Rust 1.70+. [Install Rust here](https://www.rust-lang.org/tools/install).
-
-```bash
-git clone https://github.com/steph-crown/fintrack.git
-cd fintrack
-cargo install --path .
-```
+**Don't have Rust?** [Install Rust here](https://www.rust-lang.org/tools/install) (Rust 1.70+ required).
 
 ### Verify Installation
 
