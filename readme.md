@@ -13,7 +13,15 @@ A local-first CLI financial tracker written in Rust. Track your income and expen
 
 ### macOS / Linux
 
-#### Option 1: Installer Script (Recommended)
+#### Option 1: Homebrew (Recommended)
+
+If you use Homebrew:
+
+```bash
+brew install steph-crown/fintrack/fintrack
+```
+
+#### Option 2: Installer Script
 
 Run this command in your terminal:
 
@@ -23,7 +31,7 @@ curl --proto '=https' --tlsv1.2 -LsSf https://github.com/steph-crown/fintrack/re
 
 This automatically downloads and installs FinTrack, adding it to your PATH.
 
-#### Option 2: Manual Installation
+#### Option 3: Manual Installation
 
 1. Download the appropriate `.tar.xz` file from the [Releases page](https://github.com/steph-crown/fintrack/releases/latest):
 
@@ -49,14 +57,6 @@ This automatically downloads and installs FinTrack, adding it to your PATH.
    ```bash
    chmod +x /usr/local/bin/fintrack
    ```
-
-#### Option 3: Homebrew (macOS/Linux)
-
-If you use Homebrew:
-
-```bash
-brew install steph-crown/fintrack/fintrack
-```
 
 ### Windows
 
