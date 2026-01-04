@@ -1,6 +1,6 @@
 [package]
 name = "fintrack"
-version = "0.3.5"
+version = "0.3.6"
 edition = "2024"
 authors = ["Stephen Emmanuel <emmanuelstephen024@gmail.com>"]
 description = "A local-first CLI financial tracker for managing income and expenses"
