@@ -2,6 +2,26 @@
 
 A local-first CLI financial tracker written in Rust. Track your income and expenses on your own machine, with zero cloud dependencies and complete data ownership.
 
+## Table of Contents
+
+- [Why FinTrack?](#why-fintrack)
+- [Installation](#installation)
+  - [macOS / Linux](#macos--linux)
+  - [Windows](#windows)
+  - [npm](#npm-all-platforms)
+  - [Cargo](#cargo-rust-users)
+- [Quick Start](#quick-start)
+- [Common Commands](#common-commands)
+- [Data Formats](#data-formats)
+- [Data Storage](#data-storage)
+- [Data Safety](#data-safety)
+- [Examples](#examples)
+- [Keyboard Shortcuts & Tips](#keyboard-shortcuts--tips)
+- [Troubleshooting](#troubleshooting)
+- [Future Features](#future-features)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Why FinTrack?
 
 - **Your data stays yours.** Everything is stored locally in `~/.fintrack/`. No remote servers, no accounts, no privacy concerns.
