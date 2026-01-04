@@ -221,7 +221,7 @@ checksum = "645cbb3a84e60b7531617d5ae4e57f7e27308f6445f5abf653209ea76dec8dff"
 
 [[package]]
 name = "fintrack"
-version = "0.3.2"
+version = "0.3.4"
 dependencies = [
  "chrono",
  "clap",
