@@ -1,6 +1,9 @@
 # FinTrack
 
-![FinTrack in Action](docs/images/fintrack-in-action.png)
+<div align="center">
+  <img src="docs/images/fintrack-in-action-1.png" alt="FinTrack in Action 1" width="48%" />
+  <img src="docs/images/fintrack-in-action-2.png" alt="FinTrack in Action 2" width="48%" />
+</div>
 
 A local-first CLI financial tracker written in Rust. Track your income and expenses on your own machine, with zero cloud dependencies and complete data ownership.
 
