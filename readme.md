@@ -1,5 +1,7 @@
 # FinTrack
 
+![FinTrack in Action](docs/images/fintrack-in-action.png)
+
 A local-first CLI financial tracker written in Rust. Track your income and expenses on your own machine, with zero cloud dependencies and complete data ownership.
 
 ## Table of Contents

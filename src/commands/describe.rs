@@ -9,7 +9,7 @@ use crate::{
 pub fn cli() -> Command {
   Command::new("describe")
     .about("Show financial insights and statistics")
-    .long_about("Provides an overview of your financial data including total records, date range, spending breakdown by category and subcategory, and average transaction amount. Includes visual charts for quick understanding of your spending patterns.")
+    .long_about("Provides an overview of your financial data including total records, date range, spending breakdown by category and subcategory, and average transaction amount.")
 }
 
 pub fn exec(gctx: &mut GlobalContext, _args: &ArgMatches) -> CliResult {
