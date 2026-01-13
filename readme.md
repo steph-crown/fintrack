@@ -1,5 +1,7 @@
 # FinTrack
 
+> I wrote an article on how to build this CLI tool on [freeCodeCamp](https://www.freecodecamp.org/news/how-to-build-a-local-first-cli-financial-tracker-with-rust/)
+
 <div align="center">
   <img src="docs/images/fintrack-in-action-1.png" alt="FinTrack in Action 1" width="48%" />
   <img src="docs/images/fintrack-in-action-2.png" alt="FinTrack in Action 2" width="48%" />
