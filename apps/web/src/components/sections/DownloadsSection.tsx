@@ -22,8 +22,8 @@ function CodeBlock({ code, title }: CodeBlockProps) {
       {title && (
         <div className="text-sm text-muted-foreground mb-2">{title}</div>
       )}
-      <pre className="bg-[#0d0d0d] border border-border p-4 text-sm font-mono overflow-x-auto">
-        <code className="text-green-400">{code}</code>
+      <pre className="bg-[#0d0d0d] border border-border p-4 text-sm font-mono overflow-x-auto max-w-full">
+        <code className="text-green-400 whitespace-pre">{code}</code>
       </pre>
       <Button
         variant="ghost"
@@ -69,7 +69,7 @@ export function DownloadsSection() {
 
           <TabsContent value="macos">
             <div className="grid gap-6 md:grid-cols-2">
-              <Card>
+              <Card className="overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg">Homebrew (Recommended)</CardTitle>
                   <CardDescription>
@@ -81,7 +81,7 @@ export function DownloadsSection() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg">Installer Script</CardTitle>
                   <CardDescription>
@@ -93,7 +93,7 @@ export function DownloadsSection() {
                 </CardContent>
               </Card>
 
-              <Card className="md:col-span-2">
+              <Card className="overflow-hidden md:col-span-2">
                 <CardHeader>
                   <CardTitle className="text-lg">Manual Installation</CardTitle>
                   <CardDescription>
@@ -128,7 +128,7 @@ export function DownloadsSection() {
 
           <TabsContent value="windows">
             <div className="grid gap-6 md:grid-cols-2">
-              <Card>
+              <Card className="overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg">PowerShell (Recommended)</CardTitle>
                   <CardDescription>
@@ -140,7 +140,7 @@ export function DownloadsSection() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg">MSI Installer</CardTitle>
                   <CardDescription>
@@ -162,7 +162,7 @@ export function DownloadsSection() {
                 </CardContent>
               </Card>
 
-              <Card className="md:col-span-2">
+              <Card className="overflow-hidden md:col-span-2">
                 <CardHeader>
                   <CardTitle className="text-lg">Manual Installation</CardTitle>
                   <CardDescription>
@@ -191,7 +191,7 @@ export function DownloadsSection() {
 
           <TabsContent value="linux">
             <div className="grid gap-6 md:grid-cols-2">
-              <Card>
+              <Card className="overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg">Installer Script (Recommended)</CardTitle>
                   <CardDescription>
@@ -203,7 +203,7 @@ export function DownloadsSection() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg">Manual Download</CardTitle>
                   <CardDescription>
@@ -247,7 +247,7 @@ export function DownloadsSection() {
 
           <TabsContent value="other">
             <div className="grid gap-6 md:grid-cols-2">
-              <Card>
+              <Card className="overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg">npm (All Platforms)</CardTitle>
                   <CardDescription>
@@ -259,7 +259,7 @@ export function DownloadsSection() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg">Cargo (Rust Users)</CardTitle>
                   <CardDescription>
