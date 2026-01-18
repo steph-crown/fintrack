@@ -146,11 +146,11 @@ export function AnimatedTerminal() {
       case "success":
         return "text-green-400";
       case "header":
-        return "text-muted-foreground";
+        return "text-gray-400"; // Fixed gray for dark background
       case "table":
-        return "text-foreground";
+        return "text-gray-100"; // Fixed light color for dark background
       default:
-        return line.color || "text-muted-foreground";
+        return line.color || "text-gray-400";
     }
   };
 
