@@ -101,7 +101,7 @@ export function DownloadsSection() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid gap-4 md:grid-cols-2 mb-6">
                     <div>
                       <p className="text-sm text-muted-foreground mb-2">Apple Silicon (M1/M2/M3):</p>
                       <a
@@ -120,6 +120,14 @@ export function DownloadsSection() {
                         fintrack-x86_64-apple-darwin.tar.xz
                       </a>
                     </div>
+                  </div>
+                  <div className="border-t border-border pt-4">
+                    <p className="text-sm text-muted-foreground mb-3">After downloading:</p>
+                    <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                      <li>Extract: <code className="bg-muted px-1.5 py-0.5 text-foreground">tar -xf fintrack-*.tar.xz</code></li>
+                      <li>Move to PATH: <code className="bg-muted px-1.5 py-0.5 text-foreground">mv fintrack /usr/local/bin/</code></li>
+                      <li>Make executable: <code className="bg-muted px-1.5 py-0.5 text-foreground">chmod +x /usr/local/bin/fintrack</code></li>
+                    </ol>
                   </div>
                 </CardContent>
               </Card>
@@ -211,7 +219,7 @@ export function DownloadsSection() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
+                  <div className="space-y-3 mb-6">
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">Linux x64:</p>
                       <a
@@ -239,6 +247,14 @@ export function DownloadsSection() {
                         fintrack-x86_64-unknown-linux-musl.tar.xz
                       </a>
                     </div>
+                  </div>
+                  <div className="border-t border-border pt-4">
+                    <p className="text-sm text-muted-foreground mb-3">After downloading:</p>
+                    <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                      <li>Extract: <code className="bg-muted px-1.5 py-0.5 text-foreground">tar -xf fintrack-*.tar.xz</code></li>
+                      <li>Move to PATH: <code className="bg-muted px-1.5 py-0.5 text-foreground">mv fintrack /usr/local/bin/</code></li>
+                      <li>Make executable: <code className="bg-muted px-1.5 py-0.5 text-foreground">chmod +x /usr/local/bin/fintrack</code></li>
+                    </ol>
                   </div>
                 </CardContent>
               </Card>
