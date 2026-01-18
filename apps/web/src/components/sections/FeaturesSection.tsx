@@ -58,13 +58,10 @@ const FEATURES: Feature[] = [
   {
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="8" />
-        <line x1="12" x2="12" y1="8" y2="12" />
-        <line x1="12" x2="14.5" y1="12" y2="14.5" />
-        <path d="M16.51 17.35 21 16.5" />
-        <path d="M3 16.5 7.49 17.35" />
-        <path d="M6.49 6.65 3 7.5" />
-        <path d="M21 7.5 17.51 6.65" />
+        <circle cx="12" cy="12" r="10" />
+        <path d="M15 9.5c-.5-1-1.5-1.5-3-1.5-2 0-3.5 1-3.5 2.5 0 2 2.5 2.5 4 3 1.5.5 2.5 1.5 2.5 3 0 1.5-1.5 2.5-3.5 2.5-1.5 0-2.5-.5-3-1.5" />
+        <path d="M12 5v2" />
+        <path d="M12 17v2" />
       </svg>
     ),
     title: "Multi-Currency",
