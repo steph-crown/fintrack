@@ -8,7 +8,7 @@ license = "MIT"
 repository = "https://github.com/steph-crown/fintrack"
 keywords = ["finance", "tracker", "cli", "expenses", "income"]
 categories = ["command-line-utilities"]
-homepage = "https://github.com/steph-crown/fintrack/readme.md"
+homepage = "https://fintrackcli.netlify.app/"
 
 [package.metadata.wix]
 upgrade-guid = "16FA7B2F-0A0B-4749-8982-FD92DB7041E5"
