@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface TerminalLine {
   type: "command" | "output" | "success" | "table" | "header";
@@ -9,7 +9,6 @@ interface TerminalLine {
 interface TerminalStep {
   command: string;
   output: TerminalLine[];
-  delay?: number;
 }
 
 const TERMINAL_STEPS: TerminalStep[] = [
@@ -69,6 +68,9 @@ export function AnimatedTerminal() {
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Animation ID: increments on each effect run, invalidating previous animations
+  const animationIdRef = useRef(0);
+
   // Auto-scroll to bottom when content changes
   useEffect(() => {
     if (scrollRef.current) {
@@ -76,46 +78,66 @@ export function AnimatedTerminal() {
     }
   }, [lines, currentCommand]);
 
-  const typeCommand = useCallback(async (command: string): Promise<void> => {
-    setIsTyping(true);
-    for (let i = 0; i <= command.length; i++) {
-      setCurrentCommand(command.slice(0, i));
-      await new Promise((r) => setTimeout(r, TYPING_SPEED));
-    }
-    setIsTyping(false);
-  }, []);
-
-  const showOutput = useCallback(async (output: TerminalLine[]): Promise<void> => {
-    for (const line of output) {
-      await new Promise((r) => setTimeout(r, OUTPUT_DELAY));
-      setLines((prev) => [...prev, line]);
-    }
-  }, []);
-
-  const runStep = useCallback(async (step: TerminalStep): Promise<void> => {
-    await typeCommand(step.command);
-    setLines((prev) => [...prev, { type: "command", content: `$ ${step.command}` }]);
-    setCurrentCommand("");
-    await new Promise((r) => setTimeout(r, 300));
-    await showOutput(step.output);
-    setLines((prev) => [...prev, { type: "output", content: "" }]);
-  }, [typeCommand, showOutput]);
-
   useEffect(() => {
+    // Increment animation ID - any animation with old ID will stop
+    const myId = ++animationIdRef.current;
+
+    // Helper to check if this animation is still valid
+    const isValid = () => animationIdRef.current === myId;
+
+    const typeCommand = async (command: string) => {
+      setIsTyping(true);
+      for (let i = 0; i <= command.length; i++) {
+        if (!isValid()) return false;
+        setCurrentCommand(command.slice(0, i));
+        await new Promise((r) => setTimeout(r, TYPING_SPEED));
+      }
+      if (!isValid()) return false;
+      setIsTyping(false);
+      return true;
+    };
+
+    const showOutput = async (output: TerminalLine[]) => {
+      for (const line of output) {
+        if (!isValid()) return false;
+        await new Promise((r) => setTimeout(r, OUTPUT_DELAY));
+        if (!isValid()) return false;
+        setLines((prev) => [...prev, line]);
+      }
+      return true;
+    };
+
+    const runStep = async (step: TerminalStep) => {
+      if (!await typeCommand(step.command)) return false;
+      if (!isValid()) return false;
+      setLines((prev) => [...prev, { type: "command", content: `$ ${step.command}` }]);
+      setCurrentCommand("");
+      await new Promise((r) => setTimeout(r, 300));
+      if (!isValid()) return false;
+      if (!await showOutput(step.output)) return false;
+      if (!isValid()) return false;
+      setLines((prev) => [...prev, { type: "output", content: "" }]);
+      return true;
+    };
+
     const runAnimation = async () => {
       if (stepIndex < TERMINAL_STEPS.length) {
-        await runStep(TERMINAL_STEPS[stepIndex]);
+        if (!await runStep(TERMINAL_STEPS[stepIndex])) return;
+        if (!isValid()) return;
         await new Promise((r) => setTimeout(r, STEP_DELAY));
+        if (!isValid()) return;
         setStepIndex((prev) => prev + 1);
       } else {
         // Reset and loop
         await new Promise((r) => setTimeout(r, 3000));
+        if (!isValid()) return;
         setLines([]);
         setStepIndex(0);
       }
     };
+
     runAnimation();
-  }, [stepIndex, runStep]);
+  }, [stepIndex]);
 
   const getLineClass = (line: TerminalLine) => {
     switch (line.type) {
