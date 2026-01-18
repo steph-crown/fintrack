@@ -1,6 +1,17 @@
 import { Card, CardContent } from "@/components/ui/card";
+import type { ReactNode } from "react";
 
-const FEATURES = [
+interface Feature {
+  icon: ReactNode;
+  title: string;
+  description: ReactNode;
+}
+
+const Code = ({ children }: { children: ReactNode }) => (
+  <code className="font-mono text-primary bg-primary/10 px-1 py-0.5">{children}</code>
+);
+
+const FEATURES: Feature[] = [
   {
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -9,7 +20,7 @@ const FEATURES = [
       </svg>
     ),
     title: "Your Data Stays Yours",
-    description: "Everything is stored locally in ~/.fintrack/. No remote servers, no accounts, no privacy concerns.",
+    description: <>Everything is stored locally in <Code>~/.fintrack/</Code>. No remote servers, no accounts, no privacy concerns.</>,
   },
   {
     icon: (
@@ -67,7 +78,7 @@ const FEATURES = [
       </svg>
     ),
     title: "Built-in Analytics",
-    description: "Use fintrack describe for spending breakdown, top subcategories, and transaction insights.",
+    description: <>Use <Code>fintrack describe</Code> for spending breakdown, top subcategories, and transaction insights.</>,
   },
 ];
 
