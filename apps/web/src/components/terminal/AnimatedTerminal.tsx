@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 interface TerminalLine {
   type: "command" | "output" | "success" | "table" | "header";
@@ -67,6 +67,14 @@ export function AnimatedTerminal() {
   const [currentCommand, setCurrentCommand] = useState("");
   const [stepIndex, setStepIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when content changes
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [lines, currentCommand]);
 
   const typeCommand = useCallback(async (command: string): Promise<void> => {
     setIsTyping(true);
@@ -137,8 +145,11 @@ export function AnimatedTerminal() {
           <span className="text-xs text-muted-foreground ml-2">terminal</span>
         </div>
 
-        {/* Terminal content */}
-        <div className="p-4 h-[380px] overflow-hidden font-mono text-sm">
+        {/* Terminal content - scrollable */}
+        <div
+          ref={scrollRef}
+          className="p-4 h-[380px] overflow-y-auto font-mono text-sm scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
+        >
           <div className="space-y-0.5">
             {lines.map((line, i) => (
               <div key={i} className={getLineClass(line)}>
