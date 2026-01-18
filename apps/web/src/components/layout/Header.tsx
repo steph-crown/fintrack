@@ -1,8 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
+import { useEffect, useState } from "react";
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -12,29 +23,37 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <a href="/" className="text-xl tracking-tight text-foreground">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? "border-b border-border/10 bg-background/60 backdrop-blur-md supports-[backdrop-filter]:bg-background/60"
+          : "bg-transparent border-transparent"
+      }`}
+    >
+      <div className={`mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
+        isScrolled ? "py-4" : "py-6 sm:py-8"
+      }`}>
+        <div className="flex items-center justify-between">
+          <a href="/" className="text-xl tracking-tight text-foreground font-medium">
             FinTrack
           </a>
 
           <nav className="hidden md:flex items-center gap-8">
             <button
               onClick={() => scrollToSection("features")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors text-sm"
             >
               Features
             </button>
             <button
               onClick={() => scrollToSection("getting-started")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors text-sm"
             >
               Getting Started
             </button>
             <button
               onClick={() => scrollToSection("downloads")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors text-sm"
             >
               Downloads
             </button>
