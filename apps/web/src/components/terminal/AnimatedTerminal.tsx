@@ -33,6 +33,17 @@ const TERMINAL_STEPS: TerminalStep[] = [
       { type: "output", content: "ID: 2 | expenses | Housing | 1,200.00 NGN | Rent" },
     ],
   },
+    {
+    command: "fintrack total",
+    output: [
+      { type: "header", content: "Financial Summary:" },
+      { type: "output", content: "  Opening Balance: 0.00 NGN" },
+      { type: "success", content: "  Total Income: 50,000.00 NGN" },
+      { type: "output", content: "  Total Expenses: 1,200.00 NGN", color: "text-red-400" },
+      { type: "header", content: "" },
+      { type: "success", content: "  Net Balance: 48,800.00 NGN" },
+    ],
+  },
   {
     command: "fintrack list",
     output: [
@@ -44,17 +55,7 @@ const TERMINAL_STEPS: TerminalStep[] = [
       { type: "header", content: "└────┴──────────┴───────────────┴─────────────────┴────────────┴────────────────┘" },
     ],
   },
-  {
-    command: "fintrack total",
-    output: [
-      { type: "header", content: "Financial Summary:" },
-      { type: "output", content: "  Opening Balance: 0.00 NGN" },
-      { type: "success", content: "  Total Income: 50,000.00 NGN" },
-      { type: "output", content: "  Total Expenses: 1,200.00 NGN", color: "text-red-400" },
-      { type: "header", content: "" },
-      { type: "success", content: "  Net Balance: 48,800.00 NGN" },
-    ],
-  },
+
 ];
 
 const TYPING_SPEED = 50;
