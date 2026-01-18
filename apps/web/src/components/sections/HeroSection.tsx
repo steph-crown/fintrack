@@ -38,7 +38,7 @@ export function HeroSection() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                View on GitHub
+                Star on GitHub
               </a>
             </Button>
           </div>
