@@ -1,0 +1,161 @@
+import { useEffect, useState, useCallback } from "react";
+
+interface TerminalLine {
+  type: "command" | "output" | "success" | "table" | "header";
+  content: string;
+  color?: string;
+}
+
+interface TerminalStep {
+  command: string;
+  output: TerminalLine[];
+  delay?: number;
+}
+
+const TERMINAL_STEPS: TerminalStep[] = [
+  {
+    command: "fintrack init -c NGN",
+    output: [
+      { type: "success", content: "✓ Success" },
+      { type: "output", content: "Tracker initialized successfully!" },
+    ],
+  },
+  {
+    command: "fintrack add Income 50000 -s Wages -d \"Monthly Salary\"",
+    output: [
+      { type: "success", content: "✓ Record created:" },
+      { type: "output", content: "ID: 1 | income | Wages | 50,000.00 NGN | Monthly Salary" },
+    ],
+  },
+  {
+    command: "fintrack add Expenses 1200 -s Housing -d \"Rent\"",
+    output: [
+      { type: "success", content: "✓ Record created:" },
+      { type: "output", content: "ID: 2 | expenses | Housing | 1,200.00 NGN | Rent" },
+    ],
+  },
+  {
+    command: "fintrack list",
+    output: [
+      { type: "header", content: "┌────┬──────────┬───────────────┬─────────────────┬────────────┬────────────────┐" },
+      { type: "header", content: "│ ID │ Category │ Subcategory   │ Amount          │ Date       │ Description    │" },
+      { type: "header", content: "├────┼──────────┼───────────────┼─────────────────┼────────────┼────────────────┤" },
+      { type: "table", content: "│  1 │ income   │ Wages         │   50,000.00 NGN │ 18-01-2026 │ Monthly Salary │" },
+      { type: "table", content: "│  2 │ expenses │ Housing       │    1,200.00 NGN │ 18-01-2026 │ Rent           │" },
+      { type: "header", content: "└────┴──────────┴───────────────┴─────────────────┴────────────┴────────────────┘" },
+    ],
+  },
+  {
+    command: "fintrack total",
+    output: [
+      { type: "header", content: "Financial Summary:" },
+      { type: "output", content: "  Opening Balance: 0.00 NGN" },
+      { type: "success", content: "  Total Income: 50,000.00 NGN" },
+      { type: "output", content: "  Total Expenses: 1,200.00 NGN", color: "text-red-400" },
+      { type: "header", content: "" },
+      { type: "success", content: "  Net Balance: 48,800.00 NGN" },
+    ],
+  },
+];
+
+const TYPING_SPEED = 50;
+const OUTPUT_DELAY = 100;
+const STEP_DELAY = 1500;
+
+export function AnimatedTerminal() {
+  const [lines, setLines] = useState<TerminalLine[]>([]);
+  const [currentCommand, setCurrentCommand] = useState("");
+  const [stepIndex, setStepIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+
+  const typeCommand = useCallback(async (command: string): Promise<void> => {
+    setIsTyping(true);
+    for (let i = 0; i <= command.length; i++) {
+      setCurrentCommand(command.slice(0, i));
+      await new Promise((r) => setTimeout(r, TYPING_SPEED));
+    }
+    setIsTyping(false);
+  }, []);
+
+  const showOutput = useCallback(async (output: TerminalLine[]): Promise<void> => {
+    for (const line of output) {
+      await new Promise((r) => setTimeout(r, OUTPUT_DELAY));
+      setLines((prev) => [...prev, line]);
+    }
+  }, []);
+
+  const runStep = useCallback(async (step: TerminalStep): Promise<void> => {
+    await typeCommand(step.command);
+    setLines((prev) => [...prev, { type: "command", content: `$ ${step.command}` }]);
+    setCurrentCommand("");
+    await new Promise((r) => setTimeout(r, 300));
+    await showOutput(step.output);
+    setLines((prev) => [...prev, { type: "output", content: "" }]);
+  }, [typeCommand, showOutput]);
+
+  useEffect(() => {
+    const runAnimation = async () => {
+      if (stepIndex < TERMINAL_STEPS.length) {
+        await runStep(TERMINAL_STEPS[stepIndex]);
+        await new Promise((r) => setTimeout(r, STEP_DELAY));
+        setStepIndex((prev) => prev + 1);
+      } else {
+        // Reset and loop
+        await new Promise((r) => setTimeout(r, 3000));
+        setLines([]);
+        setStepIndex(0);
+      }
+    };
+    runAnimation();
+  }, [stepIndex, runStep]);
+
+  const getLineClass = (line: TerminalLine) => {
+    switch (line.type) {
+      case "command":
+        return "text-cyan-400";
+      case "success":
+        return "text-green-400";
+      case "header":
+        return "text-muted-foreground";
+      case "table":
+        return "text-foreground";
+      default:
+        return line.color || "text-muted-foreground";
+    }
+  };
+
+  return (
+    <div className="w-full max-w-3xl mx-auto">
+      <div className="border border-border bg-[#0d0d0d] overflow-hidden">
+        {/* Terminal header */}
+        <div className="flex items-center gap-2 px-4 py-3 bg-[#1a1a1a] border-b border-border">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-500/80" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+            <div className="w-3 h-3 rounded-full bg-green-500/80" />
+          </div>
+          <span className="text-xs text-muted-foreground ml-2">terminal</span>
+        </div>
+
+        {/* Terminal content */}
+        <div className="p-4 h-[380px] overflow-hidden font-mono text-sm">
+          <div className="space-y-0.5">
+            {lines.map((line, i) => (
+              <div key={i} className={getLineClass(line)}>
+                {line.content}
+              </div>
+            ))}
+            {/* Current typing line */}
+            <div className="flex items-center text-cyan-400">
+              <span className="text-muted-foreground mr-1">$</span>
+              <span>{currentCommand}</span>
+              {isTyping && (
+                <span className="inline-block w-2 h-4 bg-cyan-400 ml-0.5 animate-pulse" />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
