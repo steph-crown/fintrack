@@ -556,3 +556,6 @@ Interested in the technical design and architecture decisions behind FinTrack? C
 ---
 
 **Get started now:** `fintrack init -c NGN`
+
+## Note
+Distributed using [cargo-dist](https://axodotdev.github.io/cargo-dist/)
